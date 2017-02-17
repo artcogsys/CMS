@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$USER_HOME$/Code/CMS/.idea/CMF.iml" filepath="$USER_HOME$/Code/CMS/.idea/CMF.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/CMF.iml" filepath="$PROJECT_DIR$/.idea/CMF.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/CMS.iml" filepath="$PROJECT_DIR$/.idea/CMS.iml" />
     </modules>
   </component>
 </project>

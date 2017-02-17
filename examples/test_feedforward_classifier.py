@@ -1,5 +1,5 @@
 import chainer
-import analysis.measures as an
+import analysis.tools as an
 from data.datasets import ClassificationDataset
 from learners.base import Learner, Tester
 from learners.iterators import *

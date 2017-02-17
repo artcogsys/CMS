@@ -1,6 +1,6 @@
 import chainer
 
-import analysis.measures as an
+import analysis.tools as an
 import models.links as L
 from data.datasets import RegressionTimeseries
 from learners.base import Learner, Tester

@@ -1,6 +1,49 @@
 import os
 import numpy as np
 import scipy.stats as ss
+import matplotlib.animation as manimation
+import matplotlib.cm as cm
+import matplotlib.pyplot as plt
+from learners.base import Tester
+from models.monitor import Monitor
+
+def movie(snapshots, data, model, function, name, dpi=100, fps=1):
+
+    # get video writer
+    FFMpegWriter = manimation.writers['ffmpeg']
+    metadata = dict(title='Movie', artist='CCNLab')
+    writer = FFMpegWriter(fps=fps, metadata=metadata)
+
+    fig = plt.figure()
+
+    fig.set_size_inches(10, 10)
+
+    # save frames
+    with writer.saving(fig, name, dpi):
+
+        for i in range(len(snapshots)):
+
+            print 'processing snapshot {0} of {1}'.format(i + 1, len(snapshots))
+
+            # load snapshot
+            model.load(snapshots[i])
+
+            # set monitor for snapshot
+            monitor = Monitor()
+
+            model.set_monitor(monitor)
+
+            # run some test data
+            Tester(model, data).run()
+
+            function(model.monitor)
+
+            writer.grab_frame()
+
+            plt.clf()
+
+    plt.close()
+
 
 def save_plot(fig, out, name):
     """ Helper function to save plot
