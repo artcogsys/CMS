@@ -28,18 +28,16 @@ class Monitor(object):
     def keys(self):
         return self._dict.keys()
 
-    def get(self, names):
-        """Returns each value for key in keys list as numpy array
+    def get(self, name):
+        """Returns dict[name] as numpy array
 
-        :param names: list of key names
-        :return: list of numpy arrays
+        :param name: list of key names
+        :return: numpy array
         """
 
-        if type(names) is str:
-            assert(names in self.keys())
-            data = np.asarray(self._dict[names])
-            return data if data.ndim <= 1 else data.squeeze(axis=1)
+        assert(name in self.keys())
+        data = np.asarray(self._dict[name])
+        if data.ndim <=2:
+            return data.reshape([np.prod(data.shape)], order='F')
         else:
-            assert(np.all(map(lambda x: x in self.keys(), names)))
-            data = [np.asarray(self._dict[k]) for k in names]
-            return map(lambda x: x if x.ndim <= 1 else x.squeeze(axis=1), data)
+            return data.reshape([np.prod(data.shape[:2])] + list(data.shape[2:]), order='F')

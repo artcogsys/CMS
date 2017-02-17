@@ -172,6 +172,8 @@ class Learner(object):
         # or to last model in case no validation set is used
         self.model = optimal_model
 
+        self.trainer.model.save(os.path.join(self.out, 'optimal-model'))
+
         self._fig.savefig(os.path.join(self.out, 'loss'))
 
         plt.close()

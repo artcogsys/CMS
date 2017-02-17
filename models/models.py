@@ -53,7 +53,9 @@ class SupervisedModel(Chain):
             y = self.predictor(x, train=train)
 
             self.monitor.append('prediction',self.output_function(y).data)
+
             loss = self.loss_function(y, t)
+
             self.monitor.append('loss', loss.data)
             self.monitor.append('target', t.data)
 

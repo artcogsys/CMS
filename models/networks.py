@@ -86,10 +86,14 @@ class ConvNet(Chain):
         :param n_hidden: number of hidden units
         :param monitor: monitors internal states
         """
+
+        k = 3 # kernel size
+        s = 1 # stride
+        p = 1 # padding
+        n_linear = n_hidden * np.prod(1 + (np.array(n_input[1:]) - k + 2*p)/s)
         super(ConvNet, self).__init__(
-            # dependence between filter size and padding; here output still 20x20 due to padding
-            l1=L.Convolution2D(n_input[0], n_hidden, 3, 1, 1),
-            l2=L.Linear(np.prod(n_input) * n_hidden, n_output)
+            l1=L.Convolution2D(n_input[0], n_hidden, k, s, p),
+            l2=L.Linear(n_linear, n_output)
         )
 
         self.ninput = n_input

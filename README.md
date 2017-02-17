@@ -47,8 +47,20 @@ How do I perform an analysis as the network is learning?
 
 * See test_learning_analysis.py
 
+How do I deal with missing targets?
+
+* Chainer handles missing targets automatically via the value -1. For floats
+there is currently no support.
+
+How do I handle trial-based data?
+
+* The SequentialIterator can be used to process a subset of different trials in each epoch.
+The reset_state at the onset of each epoch ensures proper resetting. This requires
+n_batches to be set to the (fixed) number of time points of which each trial consists.
+This is simplified by a call to TrialIterator. Also requires that the data is organised as a concatenation of trials.
+
 ## TO DO
 
 * Add example of a task
-* Add reinforcement learning algorithm
-
+* Add multiple reinforcement learning algorithms
+* Allow networks to run without input and/or output; problem; int32 representations don't allow nans

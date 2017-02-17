@@ -81,9 +81,15 @@ class MNISTData(TupleDataset):
     """
 
 
-    def __init__(self, validation=False, convolutional=True):
+    def __init__(self, test=False, convolutional=True, n_samples=None):
+        """
 
-        if validation:
+        :param test: return test instead of training set
+        :param convolutional: return convolutional representation or not
+        :param n_samples: return n_samples samples per class
+        """
+
+        if test:
             data = get_mnist()[1]
         else:
             data = get_mnist()[0]
@@ -99,4 +105,44 @@ class MNISTData(TupleDataset):
 
         self.n_output = (np.max(T) + 1)
 
+        if n_samples:
+            idx = [np.where(T==u)[0][:n_samples] for u in np.unique(T)]
+            idx = list(itertools.chain(*idx))
+            X = X[idx]
+            T = T[idx]
+
         super(MNISTData, self).__init__(X, T)
+
+
+class CIFARData(TupleDataset):
+
+    def __init__(self, test=False, convolutional=True, n_samples=None):
+        """
+
+       :param test: return test instead of training set
+       :param convolutional: return convolutional representation or not
+       :param n_samples: return n_samples samples per class
+       """
+
+        if convolutional:
+            train, test = get_cifar10(withlabel=True, ndim=3)
+        else:
+            train, test = get_cifar10(withlabel=True, ndim=1)
+
+        if test:
+            X = test._datasets[0].astype('float32')
+            T = test._datasets[1].astype('int32')
+        else:
+            X = train._datasets[0].astype('float32')
+            T = train._datasets[1].astype('int32')
+
+        self.n_input = list(X.shape[1:])
+        self.n_output = (np.max(T) + 1)
+
+        if n_samples:
+            idx = [np.where(T == u)[0][:n_samples] for u in np.unique(T)]
+            idx = list(itertools.chain(*idx))
+            X = X[idx]
+            T = T[idx]
+
+        super(CIFARData, self).__init__(X, T)

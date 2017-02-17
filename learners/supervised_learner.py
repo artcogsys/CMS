@@ -51,11 +51,23 @@ class StatefulTrainer(Trainer):
    Used to train stateful models that have persistent variables
    """
 
-    def __init__(self, optimizer, data=None, gpu=-1, cutoff=None):
+    def __init__(self, optimizer, data=None, gpu=-1, cutoff=None, last=False):
+        """
+
+        :param optimizer:
+        :param data:
+        :param gpu:
+        :param cutoff: cutoff for BPTT (n_batches if none)
+        :param last: whether to only update when the cutoff is reached (False)
+        """
+
         super(StatefulTrainer, self).__init__(optimizer, data, gpu)
 
         # cutoff for BPTT
         self.cutoff = cutoff
+
+        # whether to update from loss in last step only
+        self.last = last
 
     def run(self, data=None):
         """One training epoch
@@ -81,7 +93,10 @@ class StatefulTrainer(Trainer):
             x = Variable(self.xp.asarray([item[0] for item in batch]))
             t = Variable(self.xp.asarray([item[1] for item in batch]))
 
-            loss += self.model(x, t, train=True)
+            if self.last:
+                loss = self.model(x, t, train=True)
+            else:
+                loss += self.model(x, t, train=True)
 
             # backpropagate if we reach the cutoff for truncated backprop or if we processed the last batch
             if (self.cutoff and (data.batch_idx % self.cutoff) == 0) or \

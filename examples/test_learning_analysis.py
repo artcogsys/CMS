@@ -1,4 +1,4 @@
-# Example of how to perform a learning analysis; derived from test_feedforward_classifier
+# Example of how to perform a learning analysis; derived from test_feedforward_regressor
 
 import glob
 

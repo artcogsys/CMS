@@ -10,11 +10,12 @@ from models.monitor import Monitor
 from models.networks import ConvNet
 
 # parameters
-n_epochs = 3
+n_epochs = 100
 
 # get training and validation data
-train_data = MNISTData(validation=False, convolutional=True)
-val_data = MNISTData(validation=True, convolutional=True)
+# note that we select a subset of datapoints
+train_data = MNISTData(test=False, convolutional=True, n_samples=100)
+val_data = MNISTData(test=True, convolutional=True, n_samples=100)
 
 # define model
 model = Classifier(ConvNet(train_data.n_input, train_data.n_output, n_hidden=10))

@@ -1,22 +1,24 @@
 import chainer
+
 import analysis.tools as an
-from data.datasets import ClassificationDataset
+from data.datasets import ClassificationDataset, CIFARData
 from learners.base import Learner, Tester
 from learners.iterators import *
-from learners.supervised_learner import StatelessTrainer
+from learners.supervised_learner import StatefulTrainer
 from models.models import Classifier
 from models.monitor import Monitor
-from models.networks import MLP
+from models.networks import ConvNet
 
 # parameters
-n_epochs = 500
+n_epochs = 10
 
 # get training and validation data
-train_data = ClassificationDataset()
-val_data  = ClassificationDataset()
+# note that we select a subset of datapoints
+train_data = CIFARData(test=False, convolutional=True, n_samples=100)
+val_data = CIFARData(test=True, convolutional=True, n_samples=100)
 
 # define model
-model = Classifier(MLP(train_data.n_input, train_data.n_output, n_hidden=10, n_hidden_layers=1))
+model = Classifier(ConvNet(train_data.n_input, train_data.n_output, n_hidden=10))
 
 # Set up an optimizer
 optimizer = chainer.optimizers.Adam()
@@ -24,10 +26,11 @@ optimizer.setup(model)
 optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
 
 # define trainer object
-trainer = StatelessTrainer(optimizer, RandomIterator(train_data, batch_size=32))
+# last=True ensures that we only update at the last time point
+trainer = StatefulTrainer(optimizer, DelayIterator(train_data, trial_length=3), last=True)
 
 # define tester object
-tester = Tester(model, SequentialIterator(val_data, batch_size=32))
+tester = Tester(model, DelayIterator(val_data, trial_length=3))
 
 # define learner to run multiple epochs
 learner = Learner(trainer, tester)
@@ -42,7 +45,7 @@ model = learner.model
 model.set_monitor(Monitor())
 
 # test some data with the learner - requires target data
-tester = Tester(model, SequentialIterator(ClassificationDataset(), batch_size=1))
+tester = Tester(model, DelayIterator(val_data, trial_length=3))
 tester.run()
 
 # get variables

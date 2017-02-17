@@ -11,7 +11,9 @@ import matplotlib.pyplot as plt
 ## Iterator class; specifies how to process data in one epoch
 
 class DataIterator(object):
+
     def __init__(self, data):
+
         self.data = data
 
     def __iter__(self):
@@ -23,15 +25,17 @@ class DataIterator(object):
         raise NotImplementedError
 
 #####
-## Random iterator
+## Random iterator - returns minibatches consisting of random samples
 
 class RandomIterator(DataIterator):
 
-    def __init__(self, data, batch_size=32):
+    def __init__(self, data, batch_size=32, n_batches=None):
         super(RandomIterator, self).__init__(data)
 
         self.batch_size = batch_size
-        self.n_batches = (len(self.data) // self.batch_size)
+        self.n_batches = n_batches or (len(self.data) // self.batch_size)
+
+        assert(self.n_batches * self.batch_size <= len(self.data))
 
     def __iter__(self):
 
@@ -52,15 +56,17 @@ class RandomIterator(DataIterator):
         return [self.data[index] for index in self._order[i:(i + self.batch_size)]]
 
 #####
-## Sequential iterator
+## Sequential iterator - returns minibatches of consecutive time points
 
 class SequentialIterator(DataIterator):
 
-    def __init__(self, data, batch_size=32):
+    def __init__(self, data, batch_size=32, n_batches=None):
         super(SequentialIterator, self).__init__(data)
 
         self.batch_size = batch_size
-        self.n_batches = (len(self.data) // self.batch_size)
+        self.n_batches = n_batches or (len(self.data) // self.batch_size)
+
+        assert (self.n_batches * self.batch_size <= len(self.data))
 
     def __iter__(self):
 
@@ -76,7 +82,6 @@ class SequentialIterator(DataIterator):
 
         return self
 
-
     def next(self):
 
         if self.batch_idx == self.n_batches:
@@ -87,3 +92,54 @@ class SequentialIterator(DataIterator):
         self.batch_idx += 1
 
         return [self.data[index] for index in self._order[i:(i + self.batch_size)]]
+
+#####
+## Trial iterator - operates on consecutive trials
+
+class TrialIterator(SequentialIterator):
+
+    def __init__(self, data, trial_length):
+        """
+
+        :param data:
+        :param trial_length: number of timepoints of which a trial consists (computes n_batches)
+        """
+
+        batch_size = len(data) // trial_length
+
+        assert(trial_length * batch_size == len(data))
+
+        super(TrialIterator, self).__init__(data, batch_size)
+
+
+#####
+## Delay iterator - a trial iterator that spits out the same datapoint multiple times
+
+class DelayIterator(SequentialIterator):
+
+    def __init__(self, data, trial_length, batch_size=None, noise=None):
+        super(DelayIterator, self).__init__(data)
+
+        self.batch_size = batch_size or len(self.data)
+        self.n_batches = trial_length
+
+        # flags type of noise - not yet implemented
+        self.noise = None
+
+    def __iter__(self):
+
+        self.batch_idx = 0
+
+        # generate another random batch in each epoch
+        self._order = np.random.permutation(len(self.data))[:self.batch_size]
+
+        return self
+
+    def next(self):
+
+        if self.batch_idx == self.n_batches:
+            raise StopIteration
+
+        self.batch_idx += 1
+
+        return [self.data[index] for index in self._order]
