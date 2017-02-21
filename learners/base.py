@@ -7,6 +7,7 @@ import numpy as np
 import tqdm
 from chainer import cuda, serializers, Variable
 import os
+import analysis
 
 #####
 ## Trainer class - used to run one epoch in training mode - will run forever for life-long learning
@@ -41,14 +42,24 @@ class Trainer(object):
 
         self.iteration = 0
 
-    def run(self, data=None):
+    def run(self, data=None, plot=False):
         """ Run one training epoch
 
         :param data: iterator to run on; chooses associated self.data if left unspecified
+        :param plot: plots loss at each iteration
         :return:
         """
 
         raise NotImplementedError
+
+    def snapshot(self, idx):
+        """ Save model snapshot
+
+        :param idx: iteration
+        :return:
+        """
+        if self.iter_snapshot and idx % self.iter_snapshot == 0:
+            self.model.save(os.path.join(self.out, 'iter-snapshot-' + '{0:04d}'.format(idx)))
 
 
 #####
@@ -121,9 +132,8 @@ class Learner(object):
 
         self.epoch_snapshot = epoch_snapshot
 
-        self._fig = None
-        self._ax = None
-        self._hl = None
+        # figure handles
+        self.gfx = [None, None, None]
 
     def run(self, n_epochs=1):
         """
@@ -149,7 +159,8 @@ class Learner(object):
             else:
                 val_loss = float('nan')
 
-            self.plot_loss(train_loss, val_loss, self.epoch)
+            self.gfx = analysis.tools.plot_loss(self.gfx[0], self.gfx[1], self.gfx[2],
+                                                      self.epoch, [train_loss, val_loss], ['training', 'validation'])
 
             # store optimal model
             if np.isnan(min_loss):
@@ -163,7 +174,9 @@ class Learner(object):
             self.trainer.optimizer.new_epoch() # needed?
 
         # compute final loss
-        self.plot_loss(self.tester.run(self.trainer.data), self.tester.run(), self.epoch+1)
+        self.gfx = analysis.tools.plot_loss(self.gfx[0], self.gfx[1], self.gfx[2],
+                                                  self.epoch+1, [self.tester.run(self.trainer.data), self.tester.run()],
+                                                  ['training', 'validation'])
 
         if self.epoch_snapshot and (self.epoch + 1) % self.epoch_snapshot == 0:
             self.trainer.model.save(os.path.join(self.out, 'epoch-snapshot-' + '{0:04d}'.format(self.epoch+1)))
@@ -174,37 +187,8 @@ class Learner(object):
 
         self.trainer.model.save(os.path.join(self.out, 'optimal-model'))
 
-        self._fig.savefig(os.path.join(self.out, 'loss'))
-
+        self.fig.savefig(os.path.join(self.out, 'loss'))
         plt.close()
-
-    def plot_loss(self, train_loss, val_loss, idx):
-
-        if self._fig is None:
-
-            self._fig, self._ax = plt.subplots()
-            self._ax.set_xlabel('epoch')
-            self._ax.set_ylabel('loss')
-            self._hl = np.empty(2, dtype=object)
-            self._hl[0], = self._ax.plot(idx, train_loss)
-            self._hl[1], = self._ax.plot(idx, val_loss)
-            self._fig.legend(self._hl, ('training', 'validation'))
-            self._fig.show()
-
-        else:
-
-            x_data = np.vstack([self._hl[0].get_xdata(), idx])
-            self._hl[0].set_xdata(x_data)
-            self._hl[1].set_xdata(x_data)
-            y_data = np.vstack([self._hl[0].get_ydata(), train_loss])
-            self._hl[0].set_ydata(y_data)
-            y_data = np.vstack([self._hl[1].get_ydata(), val_loss])
-            self._hl[1].set_ydata(y_data)
-            self._ax.relim()
-            self._ax.autoscale_view()
-            self._fig.canvas.draw()
-            self._fig.canvas.flush_events()
-
 
     def load(self, fname):
 

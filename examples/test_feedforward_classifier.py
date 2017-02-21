@@ -9,7 +9,7 @@ from models.monitor import Monitor
 from models.networks import MLP
 
 # parameters
-n_epochs = 500
+n_epochs = 50
 
 # get training and validation data
 train_data = ClassificationDataset()

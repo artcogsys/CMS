@@ -1,6 +1,7 @@
-from chainer import Chain, ChainList, Variable
+from chainer import Chain, ChainList
 import chainer.links as L
 import chainer.functions as F
+from links import Elman
 import numpy as np
 
 class MLP(ChainList):
@@ -193,3 +194,30 @@ class RNN(ChainList):
     def reset_state(self):
         for i in range(self.n_hidden_layers):
             self[0][i].reset_state()
+
+#####
+## Language model
+
+class RNNForLM(Chain):
+
+    def __init__(self, n_vocab, n_hidden):
+
+        super(RNNForLM, self).__init__(
+            embed=L.EmbedID(n_vocab, n_hidden),
+            l1=L.LSTM(n_hidden, n_hidden),
+            l2=L.Linear(n_hidden, n_vocab),
+        )
+
+        for param in self.params():
+            param.data[...] = np.random.uniform(-0.1, 0.1, param.data.shape)
+
+    def __call__(self, x, train=False):
+
+        h0 = self.embed(x)
+        h1 = self.l1(F.dropout(h0, train=train))
+        y = self.l2(F.dropout(h1, train=train))
+
+        return y
+
+    def reset_state(self):
+        self.l1.reset_state()

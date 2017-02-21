@@ -1,6 +1,6 @@
 from chainer import Variable
 from base import Trainer
-import os
+from analysis.tools import plot_loss
 
 #####
 ## Stateless trainer
@@ -10,38 +10,41 @@ class StatelessTrainer(Trainer):
     Used to train stateless models that have no persistent variables
     """
 
-    def run(self, data=None):
+    def run(self, data=None, plot=False):
         """One training epoch
 
         :param data: iterator
+        :param plot: plot loss
         :return: loss
         """
 
         if data is None:
             data = self.data
 
+        if plot:
+            gfx = [None, None, None]
+
         cumloss = 0
 
         for batch in data:
 
-            if self.iter_snapshot and self.iteration % self.iter_snapshot == 0:
-                self.model.save(os.path.join(self.out, 'iter-snapshot-' + '{0:04d}'.format(self.iteration)))
+            self.snapshot(data.batch_idx)
 
             x = Variable(self.xp.asarray([item[0] for item in batch]))
             t = Variable(self.xp.asarray([item[1] for item in batch]))
 
             loss = self.model(x, t, train=True)
 
+            if plot:
+                gfx = plot_loss(gfx[0], gfx[1], gfx[2], data.batch_idx, [loss.data])
+
             self.optimizer.zero_grads()
             loss.backward()
             self.optimizer.update()
 
-            self.iteration += 1
-
             cumloss += loss.data
 
-        if self.iter_snapshot and (self.iteration+1) % self.iter_snapshot == 0:
-            self.model.save(os.path.join(self.out, 'iter-snapshot-' + '{0:04d}'.format(self.iteration+1)))
+        self.snapshot(data.batch_idx+1)
 
         return float(cumloss / data.batch_size)
 
@@ -69,7 +72,7 @@ class StatefulTrainer(Trainer):
         # whether to update from loss in last step only
         self.last = last
 
-    def run(self, data=None):
+    def run(self, data=None, plot=False):
         """One training epoch
 
         :param data: iterator
@@ -79,6 +82,10 @@ class StatefulTrainer(Trainer):
         if data is None:
             data = self.data
 
+        if plot:
+            old_loss = 0
+            gfx = [None, None, None]
+
         cumloss = 0
 
         loss = Variable(self.xp.zeros((), 'float32'))
@@ -87,13 +94,12 @@ class StatefulTrainer(Trainer):
 
         for batch in data:
 
-            if self.iter_snapshot and self.iteration % self.iter_snapshot == 0:
-                self.model.save(os.path.join(self.out, 'iter-snapshot-' + '{0:04d}'.format(self.iteration)))
+            self.snapshot(data.batch_idx)
 
             x = Variable(self.xp.asarray([item[0] for item in batch]))
             t = Variable(self.xp.asarray([item[1] for item in batch]))
 
-            if self.last:
+            if self.last: # used in case of propagating back at end of trials only
                 loss = self.model(x, t, train=True)
             else:
                 loss += self.model(x, t, train=True)
@@ -109,11 +115,12 @@ class StatefulTrainer(Trainer):
 
                 cumloss += loss.data
 
+                if plot:
+                    gfx = plot_loss(gfx[0], gfx[1], gfx[2], data.batch_idx, [cumloss - old_loss])
+                    old_loss = cumloss
+
                 loss = Variable(self.xp.zeros((), 'float32'))
 
-                self.iteration += 1
-
-        if self.iter_snapshot and (self.iteration + 1) % self.iter_snapshot == 0:
-            self.model.save(os.path.join(self.out, 'iter-snapshot-' + '{0:04d}'.format(self.iteration+1)))
+        self.snapshot(data.batch_idx+1)
 
         return float(cumloss / data.batch_size)

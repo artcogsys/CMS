@@ -1,5 +1,6 @@
-import chainer
+# example of using delayiterator to extend classification of static inputs over time
 
+import chainer
 import analysis.tools as an
 from data.datasets import ClassificationDataset, CIFARData
 from learners.base import Learner, Tester
