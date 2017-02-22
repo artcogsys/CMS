@@ -70,3 +70,6 @@ This is simplified by a call to TrialIterator. Also requires that the data is or
 * Add experiments (fully worked examples
 * Add version testing
 * Abstract as much as possible to enable use of other libraries
+* Add support for multiple agents in life-long learning setting
+* Add facility to compare different models/approaches/optimizers
+* Generate full documentation on the fly using Sphinx/Read the Docs
