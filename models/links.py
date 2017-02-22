@@ -25,32 +25,6 @@ class Offset(link.Link):
         return F.broadcast_to(self.X, z.shape)
 
 
-class ElmanBase(link.Chain):
-
-    def __init__(self, n_units, n_inputs=None, initU=None,
-                 initW=None, bias_init=0):
-        """
-
-        :param n_units: Number of hidden units
-        :param n_inputs: Number of input units
-        :param initU: Input-to-hidden weight matrix initialization
-        :param initW: Hidden-to-hidden weight matrix initialization
-        :param bias_init: Bias initialization
-
-        """
-
-        if n_inputs is None:
-            n_inputs = n_units
-
-        # H0 takes care of the initial hidden-to-hidden input for t=0
-        super(ElmanBase, self).__init__(
-            U=linear.Linear(n_inputs, n_units,
-                            initialW=initU, initial_bias=bias_init),
-            W=linear.Linear(n_units, n_units,
-                            initialW=initW, nobias=True),
-            H0=Offset(n_units),
-        )
-
 class Elman(link.Chain):
     """
     Implementation of simple linear Elman layer
