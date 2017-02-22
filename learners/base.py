@@ -187,7 +187,7 @@ class Learner(object):
 
         self.trainer.model.save(os.path.join(self.out, 'optimal-model'))
 
-        self.fig.savefig(os.path.join(self.out, 'loss'))
+        self.gfx[0].savefig(os.path.join(self.out, 'loss'))
         plt.close()
 
     def load(self, fname):
