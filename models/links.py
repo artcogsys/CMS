@@ -51,7 +51,7 @@ class ElmanBase(link.Chain):
             H0=Offset(n_units),
         )
 
-class Elman(ElmanBase):
+class Elman(link.Chain):
     """
     Implementation of simple linear Elman layer
 
@@ -65,7 +65,12 @@ class Elman(ElmanBase):
                  initW=None, bias_init=0, actfun=relu.relu):
 
         super(Elman, self).__init__(
-            out_size, in_size, initU, initW, bias_init)
+            U=linear.Linear(in_size, out_size,
+                            initialW=initU, initial_bias=bias_init),
+            W=linear.Linear(out_size, out_size,
+                            initialW=initW, nobias=True),
+            H0=Offset(out_size),
+        )
 
         self.state_size = out_size
         self.reset_state()

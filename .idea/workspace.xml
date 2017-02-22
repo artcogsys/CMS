@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9f2d2109-f80d-4ff2-a6a3-f44f2bb29cbd" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/result/confusion_matrix.png" afterPath="$PROJECT_DIR$/examples/result/confusion_matrix.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/test_contextnet.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/result/loss.png" afterPath="$PROJECT_DIR$/examples/result/loss.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/learners/base.py" afterPath="$PROJECT_DIR$/learners/base.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/result/scatterplot.png" afterPath="$PROJECT_DIR$/examples/result/scatterplot.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/links.py" afterPath="$PROJECT_DIR$/models/links.py" />
     </list>
     <ignored path="CMF.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -24,11 +26,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="base.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="base.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/learners/base.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="435">
-              <caret line="188" column="0" selection-start-line="188" selection-start-column="0" selection-end-line="188" selection-end-column="0" />
+            <state relative-caret-position="195">
+              <caret line="172" column="0" selection-start-line="172" selection-start-column="0" selection-end-line="172" selection-end-column="0" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -36,36 +38,32 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="tools.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/analysis/tools.py">
+      <file leaf-file-name="test_contextnet.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/examples/test_contextnet.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="25" column="24" selection-start-line="25" selection-start-column="24" selection-end-line="25" selection-end-column="24" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="datasets.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data/datasets.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="30" />
+            <state relative-caret-position="90">
+              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test_language_model.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/test_language_model.py">
+      <file leaf-file-name="links.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/models/links.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="27" column="95" selection-start-line="27" selection-start-column="95" selection-end-line="27" selection-end-column="95" />
-              <folding>
-                <element signature="e#40#54#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="975">
+              <caret line="71" column="25" selection-start-line="71" selection-start-column="25" selection-end-line="71" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test_elman_regressor.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/examples/test_elman_regressor.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -90,18 +88,6 @@
               <caret line="12" column="5" selection-start-line="12" selection-start-column="5" selection-end-line="12" selection-end-column="5" />
               <folding>
                 <element signature="e#47#61#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="supervised_learner.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/learners/supervised_learner.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1710">
-              <caret line="116" column="0" selection-start-line="116" selection-start-column="0" selection-end-line="116" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#28#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -189,12 +175,15 @@
         <option value="$PROJECT_DIR$/learners/iterators.py" />
         <option value="$PROJECT_DIR$/examples/test_delay_iterator.py" />
         <option value="$PROJECT_DIR$/learners/base.py" />
+        <option value="$PROJECT_DIR$/examples/test_contextnet.py" />
+        <option value="$PROJECT_DIR$/models/links.py" />
+        <option value="$PROJECT_DIR$/examples/test_elman_regressor.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="47" />
-    <option name="y" value="23" />
+    <option name="x" value="156" />
+    <option name="y" value="137" />
     <option name="width" value="1333" />
     <option name="height" value="807" />
   </component>
@@ -253,6 +242,20 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="models" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CMS" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CMS" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="learners" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -271,6 +274,24 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CMS" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CMS" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="examples" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="result" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -281,11 +302,6 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../sandbox" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/../CMF/models" />
-      <recent name="$PROJECT_DIR$/../CMF/analysis" />
-      <recent name="$PROJECT_DIR$/../CMF/learners" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/examples" />
       <recent name="$PROJECT_DIR$/../CMF/examples" />
@@ -293,8 +309,13 @@
       <recent name="$PROJECT_DIR$/../CMF/models" />
       <recent name="$PROJECT_DIR$/../CMF/learners" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/../CMF/models" />
+      <recent name="$PROJECT_DIR$/../CMF/analysis" />
+      <recent name="$PROJECT_DIR$/../CMF/learners" />
+    </key>
   </component>
-  <component name="RunManager" selected="Python.test_feedforward_classifier">
+  <component name="RunManager" selected="Python.test_elman_regressor">
     <configuration default="false" name="test_delay_iterator" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -308,23 +329,6 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="CMS" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/examples/test_delay_iterator.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
-    <configuration default="false" name="test_convnet_classifier" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="CMS" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/examples/test_convnet_classifier.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -376,6 +380,23 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="CMS" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/examples/test_hydranet.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="test_elman_regressor" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="CMS" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/examples/test_elman_regressor.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -516,18 +537,18 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.test_delay_iterator" />
-      <item index="1" class="java.lang.String" itemvalue="Python.test_convnet_classifier" />
-      <item index="2" class="java.lang.String" itemvalue="Python.test_language_model" />
-      <item index="3" class="java.lang.String" itemvalue="Python.test_feedforward_classifier" />
-      <item index="4" class="java.lang.String" itemvalue="Python.test_hydranet" />
+      <item index="1" class="java.lang.String" itemvalue="Python.test_language_model" />
+      <item index="2" class="java.lang.String" itemvalue="Python.test_feedforward_classifier" />
+      <item index="3" class="java.lang.String" itemvalue="Python.test_hydranet" />
+      <item index="4" class="java.lang.String" itemvalue="Python.test_elman_regressor" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.test_feedforward_classifier" />
-        <item index="1" class="java.lang.String" itemvalue="Python.test_delay_iterator" />
-        <item index="2" class="java.lang.String" itemvalue="Python.test_hydranet" />
-        <item index="3" class="java.lang.String" itemvalue="Python.test_language_model" />
-        <item index="4" class="java.lang.String" itemvalue="Python.test_convnet_classifier" />
+        <item index="0" class="java.lang.String" itemvalue="Python.test_elman_regressor" />
+        <item index="1" class="java.lang.String" itemvalue="Python.test_feedforward_classifier" />
+        <item index="2" class="java.lang.String" itemvalue="Python.test_delay_iterator" />
+        <item index="3" class="java.lang.String" itemvalue="Python.test_hydranet" />
+        <item index="4" class="java.lang.String" itemvalue="Python.test_language_model" />
       </list>
     </recent_temporary>
   </component>
@@ -545,7 +566,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="47" y="23" width="1333" height="807" extended-state="0" />
+    <frame x="156" y="137" width="1333" height="807" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23932926" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
@@ -553,7 +574,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3262317" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3048951" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3048951" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32780084" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
@@ -604,13 +625,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/models/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../CMF/data/base.py" />
     <entry file="file://$PROJECT_DIR$/../CMF/ANN/models/custom_links.py" />
     <entry file="file://$PROJECT_DIR$/../CMF/ANN/models/utilities.py" />
@@ -653,18 +667,6 @@
     <entry file="file://$PROJECT_DIR$/../CMF/analysis/reporter.py" />
     <entry file="file://$PROJECT_DIR$/../CMF/examples/result/confusion_matrix0.png" />
     <entry file="file://$PROJECT_DIR$/../CMF/analysis/plotting.py" />
-    <entry file="file://$PROJECT_DIR$/examples/result/scatterplot.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/links.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="14" column="32" selection-start-line="14" selection-start-column="32" selection-end-line="14" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/examples/test_recurrent_regressor.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
@@ -722,23 +724,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/test_elman_regressor.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="645">
-          <caret line="55" column="0" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/models/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="870">
           <caret line="65" column="0" selection-start-line="65" selection-start-column="0" selection-end-line="65" selection-end-column="0" />
         </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/examples/result/confusion_matrix.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/examples/test_feedforward_classifier.py">
@@ -851,11 +841,45 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/learners/base.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="188" column="0" selection-start-line="188" selection-start-column="0" selection-end-line="188" selection-end-column="0" />
+        <state relative-caret-position="195">
+          <caret line="172" column="0" selection-start-line="172" selection-start-column="0" selection-end-line="172" selection-end-column="0" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/test_contextnet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/result/confusion_matrix.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/result/scatterplot.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/test_elman_regressor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/links.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="975">
+          <caret line="71" column="25" selection-start-line="71" selection-start-column="25" selection-end-line="71" selection-end-column="25" />
+          <folding />
         </state>
       </provider>
     </entry>
