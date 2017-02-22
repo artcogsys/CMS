@@ -2,13 +2,49 @@
 
 import chainer
 import analysis.tools as an
-from data.datasets import ClassificationDataset, CIFARData
+from data.datasets import CIFARData
 from learners.base import Learner, Tester
 from learners.iterators import *
 from learners.supervised_learner import StatefulTrainer
 from models.models import Classifier
 from models.monitor import Monitor
 from models.networks import ConvNet
+
+#####
+## Delay iterator - a trial iterator that spits out the same datapoint n_batch times
+
+class DelayIterator(SequentialIterator):
+
+    def __init__(self, data, trial_length, batch_size=None, noise=None):
+        super(DelayIterator, self).__init__(data)
+
+        self.batch_size = batch_size or len(self.data)
+        self.n_batches = trial_length
+
+        # flags type of noise - not yet implemented
+        self.noise = None
+
+    def __iter__(self):
+
+        self.batch_idx = 0
+
+        # generate another random batch in each epoch
+        self._order = np.random.permutation(len(self.data))[:self.batch_size]
+
+        return self
+
+    def next(self):
+
+        if self.batch_idx == self.n_batches:
+            raise StopIteration
+
+        self.batch_idx += 1
+
+        return [self.data[index] for index in self._order]
+
+
+#####
+## Main
 
 # parameters
 n_epochs = 10
