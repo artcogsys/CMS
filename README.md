@@ -1,6 +1,13 @@
 # Cognitive Modeling Suite (CMS)
 
 Framework for neural network modeling and analysis of cognitive processes.
+The aim of this framework is to provide a generic approach to training
+and testing of neural networks on supervised, unsupervised and reinforcement
+learning tasks. It will support life-long learning and the use of multiple
+agents at the same time.
+
+For specific resource intensive applications it is adviced to develop
+optimized code. Still, snippets from CMS can be of use in that context.
 
 ## Analysis
 
@@ -73,3 +80,6 @@ This is simplified by a call to TrialIterator. Also requires that the data is or
 * Add support for multiple agents in life-long learning setting
 * Add facility to compare different models/approaches/optimizers
 * Generate full documentation on the fly using Sphinx/Read the Docs
+* Add support for multiple optimizers in Trainer and multiple models in Tester
+* Move basic datasets to version testing; keep core codebase as clean
+as possible, e.g. by moving part of this code to specific test cases

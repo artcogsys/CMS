@@ -22,7 +22,7 @@ class StatelessTrainer(Trainer):
             data = self.data
 
         if plot:
-            gfx = [None, None, None]
+            gfx = [None, None, None] # fig, axis, data handles
 
         cumloss = 0
 

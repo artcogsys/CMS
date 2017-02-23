@@ -85,7 +85,7 @@ class ContextLayer(chainer.Link):
             W = F.broadcast_to(W, [batch_size] + sz)
             zz = F.tile(F.reshape(z[:,i],[batch_size,1,1]),tuple([1] + sz))
             C = zz * W
-            y += F.squeeze(F.batch_matmul(F.expand_dims(x,2),C,transa=True,transb=True), 1)
+            y += F.squeeze(F.batch_matmul(C, x), 2)
         y += F.tile(self.b,tuple([batch_size,1]))
 
         return y
@@ -152,7 +152,7 @@ class ContextMLP(ChainList):
 ## Main
 
 # parameters
-n_epochs = 50
+n_epochs = 5
 
 # get training and validation data
 train_data = ClassificationDataset()

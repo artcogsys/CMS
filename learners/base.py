@@ -17,7 +17,7 @@ class Trainer(object):
     def __init__(self, optimizer, data, gpu=-1, iter_snapshot=None, out='result'):
         """
 
-        :param optimizer: optimizer to train model
+        :param optimizer: optimizer(s) to train model(s)
         :param data_iterator: iterator over the training data
         :param validation: optional validation iterator (selects optimal model)
         :param gpu: device flag
@@ -133,7 +133,7 @@ class Learner(object):
         self.epoch_snapshot = epoch_snapshot
 
         # figure handles
-        self.gfx = [None, None, None]
+        self.gfx = [None, None, None]  # fig, axis, data handles
 
     def run(self, n_epochs=1):
         """
