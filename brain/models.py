@@ -11,13 +11,10 @@ import chainer.functions as F
 ## Wrappers that compute the loss (negative objective function) and the final output for a neural network
 #  The predictor is the neural network architecture which gives the predictions for which we can compute outputs and loss
 
-class SupervisedModel(Chain):
+class Model(Chain):
 
-    def __init__(self, predictor, loss_function=None, output_function=lambda x:x, monitor=None):
-        super(SupervisedModel, self).__init__(predictor=predictor)
-
-        self.loss_function = loss_function
-        self.output_function = output_function
+    def __init__(self, predictor, monitor=None):
+        super(Model, self).__init__(predictor=predictor)
 
         self.set_monitor(monitor)
 
@@ -39,6 +36,24 @@ class SupervisedModel(Chain):
 
         serializers.save_npz('{}'.format(fname), self)
 
+    def __call__(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def predict(self, x, train=False):
+        raise NotImplementedError
+
+#####
+## Supervised model
+#
+
+class SupervisedModel(Model):
+
+    def __init__(self, predictor, loss_function=None, output_function=lambda x:x, monitor=None):
+        super(SupervisedModel, self).__init__(predictor=predictor, monitor=monitor)
+
+        self.loss_function = loss_function
+        self.output_function = output_function
+
     def __call__(self, x, t, train=False):
         """
 
@@ -58,6 +73,9 @@ class SupervisedModel(Chain):
 
             self.monitor.append('loss', loss.data)
             self.monitor.append('target', t.data)
+
+            # run defined function
+            self.monitor.run()
 
             return loss
 
@@ -79,6 +97,10 @@ class SupervisedModel(Chain):
             y = self.predictor(x, train=train)
             output = self.output_function(y).data
             self.monitor.append('prediction', output)
+
+            # run defined function
+            self.monitor.run()
+
             return output
 
         else:

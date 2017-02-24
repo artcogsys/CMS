@@ -2,7 +2,7 @@ import os
 import numpy as np
 import matplotlib.animation as manimation
 import matplotlib.pyplot as plt
-from world.base import World
+import world
 from brain.monitor import Monitor
 
 def plot_loss(gfx, idx, losses, labels=None):
@@ -69,7 +69,7 @@ def movie(snapshots, data_iter, agent, function, name, dpi=100, fps=1):
 
             agent.model.set_monitor(monitor)
 
-            world = World(agent)
+            world = world.base.World(agent)
 
             # run some test data
             world.test(data_iter)

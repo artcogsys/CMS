@@ -87,8 +87,6 @@ class SequentialIterator(Iterator):
 
         super(SequentialIterator, self).__init__(batch_size=batch_size, n_batches=n_batches)
 
-        assert (self.n_batches * self.batch_size <= len(self.data))
-
     def __iter__(self):
 
         self.idx = 0
@@ -113,24 +111,3 @@ class SequentialIterator(Iterator):
         self.idx += 1
 
         return [self.data[index] for index in self._order[i:(i + self.batch_size)]]
-
-
-
-# #####
-# ## Trial iterator - operates on consecutive trials
-#
-# class TrialIterator(SequentialIterator):
-#
-#     def __init__(self, data, n_batches):
-#         """
-#
-#         :param data:
-#         :param n_batches: number of timepoints of which a trial consists
-#         """
-#
-#         batch_size = len(data) // n_batches
-#
-#         # this must hold for trial-based data
-#         assert(n_batches * batch_size == len(data))
-#
-#         super(TrialIterator, self).__init__(data, batch_size=batch_size, n_batches=n_batches)

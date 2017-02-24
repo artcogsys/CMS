@@ -65,7 +65,7 @@ How do I handle trial-based data?
 * The SequentialIterator can be used to process a subset of different trials in each epoch.
 The reset_state at the onset of each epoch ensures proper resetting. This requires
 n_batches to be set to the (fixed) number of time points of which each trial consists.
-This is simplified by a call to TrialIterator. Also requires that the data is organised as a concatenation of trials.
+Also requires that the data is organised as a concatenation of trials.
 
 ## TO DO
 
@@ -85,3 +85,5 @@ as possible, e.g. by moving part of this code to specific test cases
 * Create agents that have train and test modes; but how to best support multiagent.
 Agents running on environments
 * World should be able to return losses
+* Allow input/output/anything visualizer during training; not just loss
+* allow handling of data of different tuple sizes

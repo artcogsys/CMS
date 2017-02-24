@@ -24,6 +24,11 @@ class World(object):
             self.agents = agents
 
         self.out = out
+        if not self.out is None:
+            try:
+                os.makedirs(self.out)
+            except OSError:
+                pass
 
         self.n_agents = len(self.agents)
 
@@ -59,9 +64,12 @@ class World(object):
                 losses = map(lambda x: x.run(data, train=train, idx=data_iter.idx, final=data_iter.is_final()), self.agents)
 
                 if not per_epoch:
-                    idx = data_iter.idx + epoch * data_iter.n_batches
+
+                    idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
+
                     if plot:
                         gfx = tools.plot_loss(gfx, idx, losses, self.labels)
+
                     if snapshot and data_iter.idx % snapshot == 0:
                         self.save_snapshot(idx)
 
@@ -121,9 +129,12 @@ class World(object):
                 losses = map(lambda x: x.run(data, train=True, idx=data_iter.idx, final=data_iter.is_final()), self.agents)
 
                 if not per_epoch:
-                    idx = data_iter.idx + epoch * data_iter.n_batches
+
+                    idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
+
                     if plot:
                         gfx = tools.plot_loss(gfx, idx, losses, self.labels)
+
                     if snapshot and data_iter.idx % snapshot == 0:
                         self.save_snapshot(idx)
 

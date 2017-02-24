@@ -3,15 +3,18 @@ import numpy as np
 
 class Monitor(object):
 
-    def __init__(self, names=None):
+    def __init__(self, names=None, function=None):
         """
 
         :param names: if defined then the name or list of names indicates keys to store
+        :param function: optional function that is applied after each processing cycle
         """
 
         self._dict = defaultdict(list)
 
         self._names = [names] if names is str else names
+
+        self.function = function
 
 
     def append(self, name, value):
@@ -41,3 +44,7 @@ class Monitor(object):
             return data.reshape([np.prod(data.shape)], order='F')
         else:
             return data.reshape([np.prod(data.shape[:2])] + list(data.shape[2:]), order='F')
+
+    def run(self):
+        if not self.function is None:
+            self.function()
