@@ -1,60 +1,53 @@
-import chainer
-
-import analysis.tools as an
-from data.datasets import MNISTData
-from learners.base import Learner, Tester
-from learners.iterators import *
-from learners.supervised_learner import StatelessTrainer
-from models.models import Classifier
-from models.monitor import Monitor
-from models.networks import ConvNet
+import matplotlib.pyplot as plt
+import tools as tools
+from agent.supervised import StatelessAgent
+from brain.models import *
+from brain.monitor import Monitor
+from brain.networks import *
+from world.base import World
+from world.datasets import MNISTData
+from world.iterators import *
 
 # parameters
-n_epochs = 100
+n_epochs = 50
 
-# get training and validation data
-# note that we select a subset of datapoints
+# get training and validation data - note that we select a subset of datapoints
 train_data = MNISTData(test=False, convolutional=True, n_samples=100)
 val_data = MNISTData(test=True, convolutional=True, n_samples=100)
 
-# define model
-model = Classifier(ConvNet(train_data.n_input, train_data.n_output, n_hidden=10))
+# define training and validation environment
+train_iter = RandomIterator(train_data, batch_size=32)
+val_iter = RandomIterator(val_data, batch_size=32)
 
-# Set up an optimizer
-optimizer = chainer.optimizers.Adam()
-optimizer.setup(model)
-optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
+# define brain of agent
+model = Classifier(ConvNet(train_iter.data.input(), train_iter.data.output(), n_hidden=10))
 
-# define trainer object
-trainer = StatelessTrainer(optimizer, RandomIterator(train_data, batch_size=32))
+# define agent
+agent = StatelessAgent(model, chainer.optimizers.Adam())
 
-# define tester object
-tester = Tester(model, SequentialIterator(val_data, batch_size=32))
+# add hook
+agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
 
-# define learner to run multiple epochs
-learner = Learner(trainer, tester)
+# define world
+world = World(agent)
 
-# run the optimization
-learner.run(n_epochs)
-
-# get trained model
-model = learner.model
+# run world in training mode with validation
+world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=True)
 
 # add monitor to model
-model.set_monitor(Monitor())
+world.agents[0].model.set_monitor(Monitor())
 
-# test some data with the learner - requires target data
-tester = Tester(model, SequentialIterator(val_data, batch_size=1))
-tester.run()
+# run world in test mode
+world.test(SequentialIterator(val_data, batch_size=1), n_epochs=1, plot=False)
 
 # get variables
-Y = model.monitor.get('prediction')
-T = model.monitor.get('target')
+Y = world.agents[0].model.monitor.get('prediction')
+T = world.agents[0].model.monitor.get('target')
 [n_samples, n_vars] = Y.shape
 
 # plot confusion matrix
 
-conf_mat = an.confusion_matrix(Y, T)
+conf_mat = tools.confusion_matrix(Y, T)
 
 fig = plt.figure()
 
@@ -66,8 +59,8 @@ plt.gca().set_xticklabels([str(item) for item in 1 + np.arange(n_vars)])
 plt.yticks(np.arange(n_vars))
 plt.gca().set_yticklabels([str(item) for item in 1 + np.arange(n_vars)])
 plt.colorbar()
-plt.title('Confusion matrix')
+plt.title('Confusion matrix; accuracy = ' + str(100.0 * np.sum(np.diag(conf_mat))/np.sum(conf_mat[...])) + '%')
 
-an.save_plot(fig,'result','confusion_matrix')
+tools.save_plot(fig, world.out, 'confusion_matrix')
 
 plt.close()

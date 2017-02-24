@@ -1,26 +1,21 @@
 import os
 import numpy as np
-import scipy.stats as ss
 import matplotlib.animation as manimation
-import matplotlib.cm as cm
 import matplotlib.pyplot as plt
-from learners.base import Tester
-from models.monitor import Monitor
+from world.base import World
+from brain.monitor import Monitor
 
-
-def plot_loss(fig, ax, hl, idx, losses, labels=None):
+def plot_loss(gfx, idx, losses, labels=None):
     """ Plot losses
 
-    :param fig: figure handle
-    :param ax: axis handle
-    :param hl: data handle
+    :param gfx: list of [figure handle, axis handle, hl: data handle]
     :param idx: index at which to plot loss
     :param losses: list of loss values
-    :param idx: optional list of loss labels
+    :param labels: optional list of loss labels
     :return: fig, ax, hl
     """
 
-    if fig is None:
+    if gfx is None:
 
         fig, ax = plt.subplots()
         ax.set_xlabel('t')
@@ -34,6 +29,10 @@ def plot_loss(fig, ax, hl, idx, losses, labels=None):
 
     else:
 
+        fig = gfx[0]
+        ax = gfx[1]
+        hl = gfx[2]
+
         x_data = np.vstack([hl[0].get_xdata(), idx])
         for i in range(len(losses)):
             hl[i].set_xdata(x_data)
@@ -44,9 +43,9 @@ def plot_loss(fig, ax, hl, idx, losses, labels=None):
         fig.canvas.draw()
         fig.canvas.flush_events()
 
-    return fig, ax, hl
+    return [fig, ax, hl]
 
-def movie(snapshots, data, model, function, name, dpi=100, fps=1):
+def movie(snapshots, data_iter, agent, function, name, dpi=100, fps=1):
 
     # get video writer
     FFMpegWriter = manimation.writers['ffmpeg']
@@ -62,20 +61,20 @@ def movie(snapshots, data, model, function, name, dpi=100, fps=1):
 
         for i in range(len(snapshots)):
 
-            print 'processing snapshot {0} of {1}'.format(i + 1, len(snapshots))
-
             # load snapshot
-            model.load(snapshots[i])
+            agent.model.load(snapshots[i])
 
             # set monitor for snapshot
             monitor = Monitor()
 
-            model.set_monitor(monitor)
+            agent.model.set_monitor(monitor)
+
+            world = World(agent)
 
             # run some test data
-            Tester(model, data).run()
+            world.test(data_iter)
 
-            function(model.monitor)
+            function(agent.model.monitor)
 
             writer.grab_frame()
 

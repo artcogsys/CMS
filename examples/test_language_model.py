@@ -1,43 +1,40 @@
-# test language prediction on PTB data
+# test language prediction on character level PTB data
 
-import chainer
-
-from data.datasets import PTBCharData
-from learners.base import Learner, Tester
-from learners.iterators import *
-from learners.supervised_learner import StatefulTrainer
-from models.models import Classifier
-from models.networks import RNNForLM
+from agent.supervised import StatefulAgent
+from brain.models import *
+from brain.networks import *
+from world.base import World
+from world.iterators import *
+from world.datasets import PTBCharData
 
 # parameters
 n_epochs = 100
 
-# get training and validation data
+# get training and validation data - note that we select a subset of datapoints
 train_data = PTBCharData(kind='train')
 val_data  = PTBCharData(kind='validation')
 
-# define model
+# define training and validation environment
+train_iter = SequentialIterator(train_data, batch_size=20, n_batches=100)
+val_iter = SequentialIterator(val_data, batch_size=20, n_batches=100)
+
+# define brain of agent
 model = Classifier(RNNForLM(train_data.n_vocab, n_hidden=20))
 
-# Set up an optimizer
-optimizer = chainer.optimizers.SGD(lr=1.0)
-optimizer.setup(model)
-optimizer.add_hook(chainer.optimizer.GradientClipping(5))
+# define agent
+agent = StatefulAgent(model, chainer.optimizers.SGD(lr=1.0), cutoff=100)
 
-# define trainer object - train on sequences of length 100 characters
-trainer = StatefulTrainer(optimizer, SequentialIterator(train_data, batch_size=20, n_batches=100), cutoff=100)
+# add hook
+agent.optimizer.add_hook(chainer.optimizer.GradientClipping(5))
 
-# define tester object
-tester = Tester(model, SequentialIterator(val_data, batch_size=20, n_batches=100))
+# define world
+world = World(agent)
 
-# define learner to run multiple epochs
-learner = Learner(trainer, tester)
-
-# run the optimization
-learner.run(n_epochs)
+# run world in training mode with validation
+world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=True)
 
 # get trained model
-model = learner.model
+model = world.agents[0].model
 
 # predict characters
 C=[]

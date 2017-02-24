@@ -1,59 +1,69 @@
-import chainer
+# Toy dataset for dynamic classification data
 
-import analysis.tools as an
-from data.datasets import ClassificationTimeseries
-from learners.base import Learner, Tester
-from learners.iterators import *
-from learners.supervised_learner import StatefulTrainer
-from models.models import Classifier
-from models.monitor import Monitor
-from models.networks import RNN
+import random
+
+import matplotlib.pyplot as plt
+import tools as tools
+from agent.supervised import StatefulAgent
+from brain.models import *
+from brain.monitor import Monitor
+from brain.networks import *
+from chainer.datasets import TupleDataset
+from world.base import World
+from world.iterators import *
 
 # parameters
-n_epochs = 200
+n_epochs = 150
 
-# get training and validation data
-train_data = ClassificationTimeseries()
-val_data  = ClassificationTimeseries()
+# define dataset
+class MyDataset(TupleDataset):
 
-# define model
-model = Classifier(RNN(train_data.n_input, train_data.n_output, n_hidden=10, n_hidden_layers=1))
+    def __init__(self):
 
-# Set up an optimizer
-optimizer = chainer.optimizers.Adam()
-optimizer.setup(model)
-optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
+        X = np.array([np.array([random.random(), random.random()], 'float32') for _ in xrange(1000)])
+        T = np.array([np.array(0, 'int32')] + [np.array(0, 'int32') if sum(i) < 1.0 else np.array(1, 'int32') for i in X][:-1])
 
-# define trainer object
-trainer = StatefulTrainer(optimizer, SequentialIterator(train_data, batch_size=32))
+        super(MyDataset, self).__init__(X, T)
 
-# define tester object
-tester = Tester(model, SequentialIterator(val_data, batch_size=32))
+    def input(self):
+        return np.prod(self._datasets[0].shape[1:])
 
-# define learner to run multiple epochs
-learner = Learner(trainer, tester)
+    def output(self):
+        return np.max(self._datasets[1].data) + 1
 
-# run the optimization
-learner.run(n_epochs)
+# define training and validation environment
+train_iter = SequentialIterator(MyDataset(), batch_size=32)
+val_iter = SequentialIterator(MyDataset(), batch_size=32)
 
-# get trained model
-model = learner.model
+# define brain of agent
+model = Classifier(RNN(train_iter.data.input(), train_iter.data.output(), n_hidden=10, n_hidden_layers=1))
+
+# define agent
+agent = StatefulAgent(model, chainer.optimizers.Adam())
+
+# add hook
+agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
+
+# define world
+world = World(agent)
+
+# run world in training mode with validation
+world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=True)
 
 # add monitor to model
-model.set_monitor(Monitor())
+world.agents[0].model.set_monitor(Monitor())
 
-# test some data with the learner - requires target data
-tester = Tester(model, SequentialIterator(ClassificationTimeseries(), batch_size=1))
-tester.run()
+# run world in test mode
+world.test(SequentialIterator(MyDataset(), batch_size=1), n_epochs=1, plot=False)
 
 # get variables
-Y = model.monitor.get('prediction')
-T = model.monitor.get('target')
+Y = world.agents[0].model.monitor.get('prediction')
+T = world.agents[0].model.monitor.get('target')
 [n_samples, n_vars] = Y.shape
 
 # plot confusion matrix
 
-conf_mat = an.confusion_matrix(Y, T)
+conf_mat = tools.confusion_matrix(Y, T)
 
 fig = plt.figure()
 
@@ -65,8 +75,8 @@ plt.gca().set_xticklabels([str(item) for item in 1 + np.arange(n_vars)])
 plt.yticks(np.arange(n_vars))
 plt.gca().set_yticklabels([str(item) for item in 1 + np.arange(n_vars)])
 plt.colorbar()
-plt.title('Confusion matrix')
+plt.title('Confusion matrix; accuracy = ' + str(100.0 * np.sum(np.diag(conf_mat))/np.sum(conf_mat[...])) + '%')
 
-an.save_plot(fig,'result','confusion_matrix')
+tools.save_plot(fig, world.out, 'confusion_matrix')
 
 plt.close()

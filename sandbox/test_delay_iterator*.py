@@ -1,14 +1,15 @@
 # example of using delayiterator to extend classification of static inputs over time
 
 import chainer
-import analysis.tools as an
-from data.datasets import CIFARData
+import tools as an
+from environments.datasets import CIFARData
 from learners.base import Learner, Tester
 from learners.iterators import *
 from learners.supervised_learner import StatefulTrainer
 from models.models import Classifier
 from models.monitor import Monitor
 from models.networks import ConvNet
+
 
 #####
 ## Delay iterator - a trial iterator that spits out the same datapoint n_batch times

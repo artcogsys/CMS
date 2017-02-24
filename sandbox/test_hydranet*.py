@@ -88,9 +88,9 @@ optimizer.setup(model)
 optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
 
 # define trainer object
-trainer = StatefulTrainer(optimizer, iter, cutoff=50)
+trainer = StatefulTrainer(optimizer, iter, cutoff=50, plot=True)
 
-trainer.run(plot=True)
+trainer.run()
 
 
 

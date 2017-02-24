@@ -75,11 +75,13 @@ This is simplified by a call to TrialIterator. Also requires that the data is or
 * Add Universe integration
 * Allow networks to run without input and/or output
 * Add experiments (fully worked examples
-* Add version testing
+* Add unit testing
 * Abstract as much as possible to enable use of other libraries
 * Add support for multiple agents in life-long learning setting
-* Add facility to compare different models/approaches/optimizers
 * Generate full documentation on the fly using Sphinx/Read the Docs
 * Add support for multiple optimizers in Trainer and multiple models in Tester
 * Move basic datasets to version testing; keep core codebase as clean
 as possible, e.g. by moving part of this code to specific test cases
+* Create agents that have train and test modes; but how to best support multiagent.
+Agents running on environments
+* World should be able to return losses

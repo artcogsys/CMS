@@ -3,17 +3,17 @@
 import math
 
 import chainer
+import chainer.functions as F
+import tools as an
 from chainer import ChainList
-import analysis.tools as an
-from data.datasets import ClassificationDataset
+from chainer import initializers
+from chainer.functions.connection import linear
+from environments.datasets import ClassificationDataset
 from learners.base import Learner, Tester
 from learners.iterators import *
 from learners.supervised_learner import StatelessTrainer
 from models.models import Classifier
 from models.monitor import Monitor
-import chainer.functions as F
-from chainer import initializers
-from chainer.functions.connection import linear
 
 # show that with this approach a perceptron can solve an xor problem
 # speed up via matrix decompositions

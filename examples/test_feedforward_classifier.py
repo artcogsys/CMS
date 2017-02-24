@@ -1,58 +1,68 @@
-import chainer
-import analysis.tools as an
-from data.datasets import ClassificationDataset
-from learners.base import Learner, Tester
-from learners.iterators import *
-from learners.supervised_learner import StatelessTrainer
-from models.models import Classifier
-from models.monitor import Monitor
-from models.networks import MLP
+# Toy dataset for static classification data
+# Generates two random inputs and classifies as 0 if their total is smaller than one
+# and as 1 otherwise
+
+import tools as tools
+from agent.supervised import StatelessAgent
+from brain.models import *
+from brain.monitor import Monitor
+from brain.networks import *
+from chainer.datasets import TupleDataset
+from world.base import World
+from world.iterators import *
 
 # parameters
-n_epochs = 50
+n_epochs = 100
 
-# get training and validation data
-train_data = ClassificationDataset()
-val_data  = ClassificationDataset()
+# define dataset
+class MyDataset(TupleDataset):
 
-# define model
-model = Classifier(MLP(train_data.n_input, train_data.n_output, n_hidden=10, n_hidden_layers=1))
+    def __init__(self):
 
-# Set up an optimizer
-optimizer = chainer.optimizers.Adam()
-optimizer.setup(model)
-optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
+        X = np.random.rand(1000,2).astype('float32')
+        T = (np.sum(X,1) > 1.0).astype('int32')
 
-# define trainer object
-trainer = StatelessTrainer(optimizer, RandomIterator(train_data, batch_size=32))
+        super(MyDataset, self).__init__(X, T)
 
-# define tester object
-tester = Tester(model, SequentialIterator(val_data, batch_size=32))
+    def input(self):
+        return np.prod(self._datasets[0].shape[1:])
 
-# define learner to run multiple epochs
-learner = Learner(trainer, tester)
+    def output(self):
+        return np.max(self._datasets[1].data) + 1
 
-# run the optimization
-learner.run(n_epochs)
+# define training and validation environment
+train_iter = RandomIterator(MyDataset(), batch_size=32)
+val_iter = RandomIterator(MyDataset(), batch_size=32)
 
-# get trained model
-model = learner.model
+# define brain of agent
+model = Classifier(MLP(train_iter.data.input(), train_iter.data.output(), n_hidden=10, n_hidden_layers=1))
+
+# define agent
+agent = StatelessAgent(model, chainer.optimizers.Adam())
+
+# add hook
+agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
+
+# define world
+world = World(agent)
+
+# run world in training mode with validation
+world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=True)
 
 # add monitor to model
-model.set_monitor(Monitor())
+world.agents[0].model.set_monitor(Monitor())
 
-# test some data with the learner - requires target data
-tester = Tester(model, SequentialIterator(ClassificationDataset(), batch_size=1))
-tester.run()
+# run world in test mode
+world.test(SequentialIterator(MyDataset(), batch_size=1), n_epochs=1, plot=False)
 
 # get variables
-Y = model.monitor.get('prediction')
-T = model.monitor.get('target')
+Y = world.agents[0].model.monitor.get('prediction')
+T = world.agents[0].model.monitor.get('target')
 [n_samples, n_vars] = Y.shape
 
 # plot confusion matrix
 
-conf_mat = an.confusion_matrix(Y, T)
+conf_mat = tools.confusion_matrix(Y, T)
 
 fig = plt.figure()
 
@@ -64,8 +74,8 @@ plt.gca().set_xticklabels([str(item) for item in 1 + np.arange(n_vars)])
 plt.yticks(np.arange(n_vars))
 plt.gca().set_yticklabels([str(item) for item in 1 + np.arange(n_vars)])
 plt.colorbar()
-plt.title('Confusion matrix')
+plt.title('Confusion matrix; accuracy = ' + str(100.0 * np.sum(np.diag(conf_mat))/np.sum(conf_mat[...])) + '%')
 
-an.save_plot(fig,'result','confusion_matrix')
+tools.save_plot(fig, world.out, 'confusion_matrix')
 
 plt.close()
