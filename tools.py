@@ -67,7 +67,7 @@ def movie(snapshots, data_iter, agent, function, name, dpi=100, fps=1):
             # set monitor for snapshot
             monitor = Monitor()
 
-            agent.model.set_monitor(monitor)
+            agent.model.add_monitor(monitor)
 
             world = world.base.World(agent)
 

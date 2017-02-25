@@ -1,7 +1,8 @@
-# Toy dataset for dynamic regression data
+# Implementation of dynamic representational modeling. We assume the existence of a recurrent network containing the
+# 'representations'. Each neural population has its own (set of) RNN units. Each population projects to one output
+# variable (e.g. its BOLD response).
 
 import random
-
 import matplotlib.cm as cm
 import scipy.stats as ss
 import tools as tools
@@ -12,6 +13,58 @@ from brain.networks import *
 from chainer.datasets import TupleDataset
 from world.base import World
 from world.iterators import *
+
+#####
+## DRM
+
+class DRM(ChainList, Network):
+
+    def __init__(self, n_input, n_output, n_hidden):
+        """Each output gets its own population of n_hidden hidden units
+
+        :param n_input: sensory inputs
+        :param n_output: neural measurements
+        :param n_hidden: number of hidden units per output
+        """
+
+        links = ChainList()
+
+        # Elman layer at which the representations 'emerge'
+        links.add_link(Elman(n_input, n_hidden * n_output))
+
+        # add LSTM mechanism per output and a linear readout mechanism
+        for i in range(n_output):
+            links.add_link(L.LSTM(n_hidden, 1))
+            links.add_link(L.Linear(1,1))
+
+        self.n_input = n_input
+        self.n_output = n_output
+        self.n_hidden = n_hidden
+        self.monitor = None
+
+        super(DRM, self).__init__(links)
+
+    def __call__(self, x, train=False):
+
+        # recurrent network
+        h = self[0][0](x)
+
+        # readout mechanism
+        z = []
+        for i in range(self.n_output):
+            tmp = self[0][1+2*i](h[:,(i*self.n_hidden):((i+1)*self.n_hidden)])
+            z.append(self[0][1+2*i+1](tmp))
+
+        # combine all outputs
+        y = F.concat(tuple(z), axis=1)
+
+        return y
+
+    def reset_state(self):
+
+        self[0][0].reset_state()
+        for i in range(len(self[0])//2):
+            self[0][1+2*i].reset_state()
 
 # parameters
 n_epochs = 150
@@ -37,7 +90,7 @@ train_iter = SequentialIterator(MyDataset(), batch_size=32)
 val_iter = SequentialIterator(MyDataset(), batch_size=32)
 
 # define brain of agent
-model = Regressor(RNN(train_iter.data.input(), train_iter.data.output(), n_hidden=10, n_hidden_layers=1))
+model = Regressor(DRM(train_iter.data.input(), train_iter.data.output(), n_hidden=5))
 
 # define agent
 agent = StatefulAgent(model, chainer.optimizers.Adam())

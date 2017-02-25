@@ -51,7 +51,7 @@ world = World(agent)
 world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=-1)
 
 # add monitor to model
-world.agents[0].model.set_monitor(Monitor())
+world.agents[0].model.add_monitor(Monitor())
 
 # run world in test mode
 world.test(SequentialIterator(MyDataset(), batch_size=1), n_epochs=1, plot=0)

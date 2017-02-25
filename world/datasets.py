@@ -172,3 +172,10 @@ class PTBCharData(TupleDataset):
         super(PTBCharData, self).__init__(data[:-1], data[1:])
 
         self.n_vocab = len(self.char_to_idx)
+
+class VIM2(TupleDataset):
+    """
+    VIM-2 Dataset
+    """
+
+    pass

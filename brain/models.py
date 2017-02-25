@@ -13,16 +13,16 @@ import chainer.functions as F
 
 class Model(Chain):
 
-    def __init__(self, predictor, monitor=None):
+    def __init__(self, predictor):
         super(Model, self).__init__(predictor=predictor)
 
-        self.set_monitor(monitor)
+        self.monitor = None
 
-    def set_monitor(self, monitor):
+    def add_monitor(self, monitor):
 
         # used to store computed states
         self.monitor = monitor
-        self.predictor.monitor = monitor
+        self.predictor.add_monitor(monitor)
 
     def load(self, fname):
         serializers.load_npz('{}'.format(fname), self)
@@ -63,8 +63,8 @@ class Model(Chain):
 
 class SupervisedModel(Model):
 
-    def __init__(self, predictor, loss_function=None, output_function=lambda x:x, monitor=None):
-        super(SupervisedModel, self).__init__(predictor=predictor, monitor=monitor)
+    def __init__(self, predictor, loss_function=None, output_function=lambda x:x):
+        super(SupervisedModel, self).__init__(predictor=predictor)
 
         self.loss_function = loss_function
         self.output_function = output_function
@@ -122,14 +122,14 @@ class SupervisedModel(Model):
 
 class Classifier(SupervisedModel):
 
-    def __init__(self, predictor, monitor=None):
+    def __init__(self, predictor):
         super(Classifier, self).__init__(predictor=predictor, loss_function=F.softmax_cross_entropy,
-                                         output_function=F.softmax, monitor=monitor)
+                                         output_function=F.softmax)
 
 #####
 ## Regressor object
 
 class Regressor(SupervisedModel):
 
-    def __init__(self, predictor, monitor=None):
-        super(Regressor, self).__init__(predictor=predictor, loss_function=F.mean_squared_error, monitor=monitor)
+    def __init__(self, predictor):
+        super(Regressor, self).__init__(predictor=predictor, loss_function=F.mean_squared_error)

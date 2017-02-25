@@ -4,7 +4,18 @@ import chainer.functions as F
 from links import Elman
 import numpy as np
 
-class MLP(ChainList):
+class Network(object):
+
+    def add_monitor(self, monitor):
+
+        # used to store computed states
+        self.monitor = monitor
+
+    def reset_state(self):
+        pass
+
+
+class MLP(ChainList, Network):
     """
     Fully connected deep neural network consisting of a chain of layers (weight matrices)
     with a fixed number of nhidden units. Defaults to a standard MLP with one hidden layer.
@@ -12,7 +23,7 @@ class MLP(ChainList):
 
      """
 
-    def __init__(self, n_input, n_output, n_hidden=10, n_hidden_layers=1, actfun=F.relu, monitor=None):
+    def __init__(self, n_input, n_output, n_hidden=10, n_hidden_layers=1, actfun=F.relu):
         """
 
         :param n_input: number of inputs
@@ -20,7 +31,6 @@ class MLP(ChainList):
         :param n_hidden: number of hidden units
         :param n_hidden_layers: number of hidden layers (1; standard MLP)
         :param actfun: used activation function (ReLU)
-        :param monitor: monitors internal states
         """
 
         links = ChainList()
@@ -37,7 +47,7 @@ class MLP(ChainList):
         self.n_output = n_output
         self.n_hidden_layers = n_hidden_layers
         self.actfun = actfun
-        self.monitor = monitor
+        self.monitor = None
 
         super(MLP, self).__init__(links)
 
@@ -68,18 +78,15 @@ class MLP(ChainList):
 
         return y
 
-    def reset_state(self):
-        pass
-
 #####
 ## Convolutional Neural Network
 
-class ConvNet(Chain):
+class ConvNet(Chain, Network):
     """
     Basic convolutional neural network
     """
 
-    def __init__(self, n_input, n_output, n_hidden=10, monitor=None):
+    def __init__(self, n_input, n_output, n_hidden=10):
         """
 
         :param n_input: nchannels x height x width
@@ -100,7 +107,7 @@ class ConvNet(Chain):
         self.ninput = n_input
         self.nhidden = n_hidden
         self.noutput = n_output
-        self.monitor = monitor
+        self.monitor = None
 
     def __call__(self, x, train=False):
         """
@@ -120,13 +127,10 @@ class ConvNet(Chain):
 
         return y
 
-    def reset_state(self):
-        pass
-
 #####
 ## Recurrent Neural Network
 
-class RNN(ChainList):
+class RNN(ChainList, Network):
     """
     Recurrent neural network consisting of a chain of layers (weight matrices)
     with a fixed number of nhidden units
@@ -136,7 +140,7 @@ class RNN(ChainList):
 
     """
 
-    def __init__(self, n_input, n_output, n_hidden=10, n_hidden_layers=1, link=L.LSTM, monitor=None):
+    def __init__(self, n_input, n_output, n_hidden=10, n_hidden_layers=1, link=L.LSTM):
         """
 
         :param n_input: number of inputs
@@ -160,7 +164,7 @@ class RNN(ChainList):
         self.nhidden = n_hidden
         self.noutput = n_output
         self.n_hidden_layers = n_hidden_layers
-        self.monitor = monitor
+        self.monitor = None
 
         super(RNN, self).__init__(links)
 
@@ -198,7 +202,7 @@ class RNN(ChainList):
 #####
 ## Language model
 
-class RNNForLM(Chain):
+class RNNForLM(Chain, Network):
 
     def __init__(self, n_vocab, n_hidden):
 

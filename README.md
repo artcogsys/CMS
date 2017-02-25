@@ -95,3 +95,6 @@ as possible, e.g. by moving part of this code to specific test cases
 Agents running on environments
 * World should be able to return losses
 * Allow input/output/anything visualizer during training; not just loss
+  Create generic monitor function; allow multiple monitors that also take
+  care of snapshots, loss, throughput; define standard monitors; this
+  makes comparison harder; since then each agent gets its own figure window

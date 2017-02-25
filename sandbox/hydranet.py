@@ -1,21 +1,18 @@
 # example of life-long learning with hydranet
 
 import chainer
-from chainer import Chain
-import chainer.functions as F
-from brain.links import Elman
-import chainer.links as L
 from world.iterators import *
 from agent.supervised import StatefulAgent
 from brain.models import Regressor
 from chainer.datasets import *
 from world.base import World
 from brain.monitor import Monitor
+from brain.networks import *
 
 #####
 ## Hydranet RNN
 
-class HydraRNN(Chain):
+class HydraRNN(Chain, Network):
 
     def __init__(self, n_input, n_hidden):
 
@@ -132,7 +129,7 @@ agent = StatefulAgent(model, chainer.optimizers.Adam(), cutoff=50)
 agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
 
 # add monitor to model and define function to apply
-agent.model.set_monitor(MyMonitor(names=['input', 'prediction'], append=False))
+agent.model.add_monitor(MyMonitor(names=['input', 'prediction'], append=False))
 
 # define world
 world = World(agent)

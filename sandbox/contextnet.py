@@ -6,10 +6,10 @@ from chainer import initializers
 from agent.supervised import StatelessAgent
 from brain.models import *
 from brain.networks import *
-from chainer.datasets import TupleDataset
 from world.base import World
 from world.iterators import *
 from chainer.functions.connection import linear
+from world.datasets import MNISTData
 
 # show that with this approach a perceptron can solve an xor problem
 # speed up via matrix decompositions
@@ -90,7 +90,7 @@ class ContextLayer(chainer.Link):
 #####
 ## Define ContextMLP
 
-class ContextMLP(ChainList):
+class ContextMLP(ChainList, Network):
 
     def __init__(self, n_input, n_output, n_hidden=10, n_hidden_layers=1, actfun=F.relu):
         """
@@ -140,9 +140,6 @@ class ContextMLP(ChainList):
 
         return y
 
-    def reset_state(self):
-        pass
-
 
 #####
 ## Main
@@ -150,23 +147,12 @@ class ContextMLP(ChainList):
 # parameters
 n_epochs = 70
 
-# define dataset
-class MyDataset(TupleDataset):
-    def __init__(self):
-        X = np.random.rand(1000, 2).astype('float32')
-        T = (np.sum(X, 1) > 1.0).astype('int32')
-
-        super(MyDataset, self).__init__(X, T)
-
-    def input(self):
-        return np.prod(self._datasets[0].shape[1:])
-
-    def output(self):
-        return np.max(self._datasets[1].data) + 1
+train_data = MNISTData(test=False, convolutional=False, n_samples=100)
+val_data = MNISTData(test=True, convolutional=False, n_samples=100)
 
 # define training and validation environment
-train_iter = RandomIterator(MyDataset(), batch_size=32)
-val_iter = RandomIterator(MyDataset(), batch_size=32)
+train_iter = RandomIterator(train_data, batch_size=32)
+val_iter = RandomIterator(val_data, batch_size=32)
 
 # define agent 1
 model1 = Classifier(ContextMLP(train_iter.data.input(), train_iter.data.output(), n_hidden=10, n_hidden_layers=1))
