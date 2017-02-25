@@ -47,4 +47,4 @@ world = World([agent1, agent2])
 world.labels = ['LSTM train', 'Elman train', 'LSTM test', 'Elman test']
 
 # run world in training mode with validation
-world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=True)
+world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=-1)

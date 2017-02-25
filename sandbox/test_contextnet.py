@@ -2,18 +2,14 @@
 
 import math
 
-import chainer
-import chainer.functions as F
-import tools as an
-from chainer import ChainList
 from chainer import initializers
+from agent.supervised import StatelessAgent
+from brain.models import *
+from brain.networks import *
+from chainer.datasets import TupleDataset
+from world.base import World
+from world.iterators import *
 from chainer.functions.connection import linear
-from environments.datasets import ClassificationDataset
-from learners.base import Learner, Tester
-from learners.iterators import *
-from learners.supervised_learner import StatelessTrainer
-from models.models import Classifier
-from models.monitor import Monitor
 
 # show that with this approach a perceptron can solve an xor problem
 # speed up via matrix decompositions
@@ -152,63 +148,39 @@ class ContextMLP(ChainList):
 ## Main
 
 # parameters
-n_epochs = 5
+n_epochs = 70
 
-# get training and validation data
-train_data = ClassificationDataset()
-val_data  = ClassificationDataset()
+# define dataset
+class MyDataset(TupleDataset):
+    def __init__(self):
+        X = np.random.rand(1000, 2).astype('float32')
+        T = (np.sum(X, 1) > 1.0).astype('int32')
 
-# define model
-model = Classifier(ContextMLP(train_data.n_input, train_data.n_output, n_hidden=10, n_hidden_layers=1))
+        super(MyDataset, self).__init__(X, T)
 
-# Set up an optimizer
-optimizer = chainer.optimizers.Adam()
-optimizer.setup(model)
-optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
+    def input(self):
+        return np.prod(self._datasets[0].shape[1:])
 
-# define trainer object
-trainer = StatelessTrainer(optimizer, RandomIterator(train_data, batch_size=32))
+    def output(self):
+        return np.max(self._datasets[1].data) + 1
 
-# define tester object
-tester = Tester(model, SequentialIterator(val_data, batch_size=32))
+# define training and validation environment
+train_iter = RandomIterator(MyDataset(), batch_size=32)
+val_iter = RandomIterator(MyDataset(), batch_size=32)
 
-# define learner to run multiple epochs
-learner = Learner(trainer, tester)
+# define agent 1
+model1 = Classifier(ContextMLP(train_iter.data.input(), train_iter.data.output(), n_hidden=10, n_hidden_layers=1))
+agent1 = StatelessAgent(model1, chainer.optimizers.Adam())
 
-# run the optimization
-learner.run(n_epochs)
+# define agent 2
+model2 = Classifier(MLP(train_iter.data.input(), train_iter.data.output(), n_hidden=10, n_hidden_layers=1))
+agent2 = StatelessAgent(model2, chainer.optimizers.Adam())
 
-# get trained model
-model = learner.model
+# define world
+world = World([agent1, agent2])
 
-# add monitor to model
-model.set_monitor(Monitor())
+# add labels to plot - validate first generates training losses and then test losses
+world.labels = ['Context train', 'MLP train', 'Context test', 'MLP test']
 
-# test some data with the learner - requires target data
-tester = Tester(model, SequentialIterator(ClassificationDataset(), batch_size=1))
-tester.run()
-
-# get variables
-Y = model.monitor.get('prediction')
-T = model.monitor.get('target')
-[n_samples, n_vars] = Y.shape
-
-# plot confusion matrix
-
-conf_mat = an.confusion_matrix(Y, T)
-
-fig = plt.figure()
-
-plt.imshow(conf_mat, interpolation='nearest')
-plt.xlabel('Predicted class')
-plt.ylabel('True class')
-plt.xticks(np.arange(n_vars)),
-plt.gca().set_xticklabels([str(item) for item in 1 + np.arange(n_vars)])
-plt.yticks(np.arange(n_vars))
-plt.gca().set_yticklabels([str(item) for item in 1 + np.arange(n_vars)])
-plt.colorbar()
-plt.title('Confusion matrix')
-
-an.save_plot(fig,'result','confusion_matrix')
-
-plt.close()
+# run world in training mode with validation
+world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=-1)

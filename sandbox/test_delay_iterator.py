@@ -41,7 +41,7 @@ class DelayIterator(SequentialIterator):
 
         self.idx += 1
 
-        return [self.data[index] for index in self._order]
+        return list(self.data[self._order])
 
 
 # parameters
@@ -68,13 +68,13 @@ agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
 world = World(agent)
 
 # run world in training mode with validation
-world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=True)
+world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=-1)
 
 # add monitor to model
 world.agents[0].model.set_monitor(Monitor())
 
 # run world in test mode
-world.test(SequentialIterator(val_data, batch_size=1), n_epochs=1, plot=False)
+world.test(SequentialIterator(val_data, batch_size=1), n_epochs=1, plot=0)
 
 # get variables
 Y = world.agents[0].model.monitor.get('prediction')

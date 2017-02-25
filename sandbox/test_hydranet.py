@@ -10,6 +10,7 @@ from agent.supervised import StatefulAgent
 from brain.models import Regressor
 from chainer.datasets import *
 from world.base import World
+from brain.monitor import Monitor
 
 #####
 ## Hydranet RNN
@@ -38,7 +39,7 @@ class HydraRNN(Chain):
 
 class HydraIterator(Iterator):
 
-    def __init__(self, batch_size=32, n_batches=None, n_update=1000, noise=1.0):
+    def __init__(self, batch_size=32, n_batches=None, n_update=1000, noise=0.1):
 
         batch_size = batch_size # 1 is most reasonable for realistic scenarios
 
@@ -73,18 +74,56 @@ class HydraIterator(Iterator):
 
         self.idx += 1
 
-        return [tuple([self.data[index], self.data[index] + self.noise * np.random.randn(*self.data[index].shape).astype('float32')])
-                for index in self._order]
+        # self.data[self._order[i:(i + self.batch_size)]]
+        data = self.data[self._order]
 
+        noise = data.copy()
+        mask = (np.random.rand(*data.shape) < self.noise).squeeze()
+        noise[mask] = np.random.rand(np.sum(mask==True))
+
+        return [noise, data]
+
+#####
+## Create custom monitor
+
+class MyMonitor(Monitor):
+
+    def run(self):
+
+        input = self.get('input')[-1]
+        output = self.get('prediction')[-1]
+
+        if not hasattr(self, 'fig'):
+
+            self.fig, self.ax = plt.subplots(2)
+
+            self.hl = [None, None]
+
+            self.hl[0] = self.ax[0].imshow(np.reshape(input, [28, 28]), interpolation='nearest', cmap='gray')
+            self.ax[0].set_title('input')
+            self.ax[0].axis('off')
+            self.ax[0].axis('equal')
+            self.hl[1] = self.ax[1].imshow(np.reshape(output, [28, 28]), interpolation='nearest', cmap='gray')
+            self.ax[1].set_title('output')
+            self.ax[1].axis('off')
+            self.ax[1].axis('equal')
+            self.fig.show()
+
+        else:
+
+            self.hl[0].set_data(np.reshape(input, [28, 28]))
+            self.hl[1].set_data(np.reshape(output, [28, 28]))
+            self.fig.canvas.draw()
+            self.fig.canvas.flush_events()
 
 #####
 ## Main
 
 # iterator
-iter = HydraIterator(batch_size=32, n_update=100)
+iter = HydraIterator(batch_size=32, n_update=10)
 
 # define model
-model = Regressor(HydraRNN(iter.n_input, n_hidden=10))
+model = Regressor(HydraRNN(iter.n_input, n_hidden=100))
 
 # define trainer object
 agent = StatefulAgent(model, chainer.optimizers.Adam(), cutoff=50)
@@ -92,10 +131,13 @@ agent = StatefulAgent(model, chainer.optimizers.Adam(), cutoff=50)
 # add hook
 agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
 
+# add monitor to model and define function to apply
+agent.model.set_monitor(MyMonitor(names=['input', 'prediction'], append=False))
+
 # define world
 world = World(agent)
 
 # run world in training mode
-world.train(iter, n_epochs=1, plot=1, per_epoch=False)
+world.train(iter, n_epochs=1, plot=100, monitor=100)
 
 

@@ -36,15 +36,15 @@ class World(object):
         # Note that validate first plots the training losses and then the validation losses
         self.labels = None
 
-    def run(self, data_iter, train, n_epochs=1, plot=False, snapshot=False, per_epoch=True):
+    def run(self, data_iter, train, n_epochs=1, plot=0, snapshot=0, monitor=0):
         """ run in training or test mode; training supports life-long learning given infinite environment
 
         :param data_iter: environment to run on
         :param train: run in train mode if True and test mode if False
         :param n_epochs: number of epochs to run an environment
-        :param plot: plot change in loss
-        :param snapshot: save snapshot every epoch
-        :param per_epoch: count per epoch if True and per iteration if False
+        :param plot: plot change in loss - -1 : per epoch; > 0 : after this many iterations
+        :param snapshot: save snapshot - -1 : per epoch; > 0 : after this many iterations
+        :param monitor: execute monitor.run() - -1 : per epoch; > 0 : after this many iterations
         :return:
         """
 
@@ -63,24 +63,31 @@ class World(object):
 
                 losses = map(lambda x: x.run(data, train=train, idx=data_iter.idx, final=data_iter.is_final()), self.agents)
 
-                if not per_epoch:
+                idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
 
-                    idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
+                if plot > 0 and idx % plot == 0:
+                    gfx = tools.plot_loss(gfx, idx, losses, self.labels)
 
-                    if plot:
-                        gfx = tools.plot_loss(gfx, idx, losses, self.labels)
+                if snapshot > 0 and idx % snapshot == 0:
+                    self.save_snapshot(idx)
 
-                    if snapshot and data_iter.idx % snapshot == 0:
-                        self.save_snapshot(idx)
+                # if monitor is defined then run optional monitoring function
+                if monitor > 0 and idx % monitor == 0:
+                    map(lambda x: x.model.monitor.run() if x.model.monitor else None, self.agents)
 
                 cum_loss += losses
 
-            # plot cumulative loss averaged over number of batches of each agent and store snapshot
-            if per_epoch:
-                if plot:
-                    gfx = tools.plot_loss(gfx, epoch, cum_loss / data_iter.n_batches, self.labels)
-                if snapshot and epoch % snapshot == 0:
-                    self.save_snapshot(epoch)
+            if plot == -1:
+                # plot cumulative loss averaged over number of batches of each agent
+                gfx = tools.plot_loss(gfx, epoch, cum_loss / data_iter.n_batches, self.labels)
+
+            # store snapshot
+            if snapshot == -1:
+                self.save_snapshot(epoch)
+
+            # if monitor is defined then run optional monitoring function
+            if monitor == -1:
+                map(lambda x: x.model.monitor.run() if x.model.monitor else None, self.agents)
 
         if plot and gfx[0]:
             gfx[0].savefig(os.path.join(self.out, 'loss'))
@@ -90,22 +97,22 @@ class World(object):
         for i in range(self.n_agents):
             self.agents[i].model.save(os.path.join(self.out, 'agent-{0:04d}-snapshot-{1:04d}'.format(i, idx)))
 
-    def train(self, data_iter, n_epochs=1, plot=False, snapshot=False, per_epoch=True):
-        self.run(data_iter, True, n_epochs=n_epochs, plot=plot, snapshot=snapshot, per_epoch=per_epoch)
+    def train(self, data_iter, n_epochs=1, plot=0, snapshot=0, monitor=0):
+        self.run(data_iter, True, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
 
-    def test(self, data_iter, n_epochs=1, plot=False, snapshot=False, per_epoch=True):
-        self.run(data_iter, False, n_epochs=n_epochs, plot=plot, snapshot=snapshot, per_epoch=per_epoch)
+    def test(self, data_iter, n_epochs=1, plot=0, snapshot=0, monitor=0):
+        self.run(data_iter, False, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
 
-    def validate(self, data_iter, validation, n_epochs=1, plot=False, snapshot=False, per_epoch=True):
+    def validate(self, data_iter, validation, n_epochs=1, plot=0, snapshot=0, monitor=0):
         """ Used to train a model and test it such as to determine the best model; this model will become
         the brain of the agent. Generalizes to the use of multiple agents
 
         :param data_iter: environment to train on
         :param validation: environment to validate on
         :param n_epochs: number of epochs to run an environment
-        :param plot: plot change in loss every nth step indicated by this parameter
-        :param snapshot: save snapshot every epoch
-        :param per_epoch: count per epoch if True and per iteration if False
+        :param plot: plot change in loss - -1 : per epoch; > 0 : after this many iterations
+        :param snapshot: save snapshot - -1 : per epoch; > 0 : after this many iterations
+        :param monitor: execute monitor.run() - -1 : per epoch; > 0 : after this many iterations
         :return:
         """
 
@@ -128,15 +135,17 @@ class World(object):
 
                 losses = map(lambda x: x.run(data, train=True, idx=data_iter.idx, final=data_iter.is_final()), self.agents)
 
-                if not per_epoch:
+                idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
 
-                    idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
+                if plot > 0 and idx % plot == 0:
+                    gfx = tools.plot_loss(gfx, idx, losses, self.labels)
 
-                    if plot:
-                        gfx = tools.plot_loss(gfx, idx, losses, self.labels)
+                if snapshot > 0 and idx % snapshot == 0:
+                    self.save_snapshot(idx)
 
-                    if snapshot and data_iter.idx % snapshot == 0:
-                        self.save_snapshot(idx)
+                # if monitor is defined then run optional monitoring function
+                if monitor > 0 and idx % monitor == 0:
+                    map(lambda x: x.model.monitor.run() if x.model.monitor else None, self.agents)
 
                 cum_loss += losses
 
@@ -151,13 +160,18 @@ class World(object):
                 val_loss += losses
 
             # plot cumulative loss averaged over number of batches of each agent
-            if per_epoch:
-                if plot:
-                    gfx = tools.plot_loss(gfx, epoch,
-                                    np.concatenate([cum_loss / data_iter.n_batches, val_loss / validation.n_batches]),
-                                    self.labels)
-                if snapshot and epoch % snapshot == 0:
-                    self.save_snapshot(epoch)
+            if plot == -1:
+                gfx = tools.plot_loss(gfx, epoch,
+                                      np.concatenate([cum_loss / data_iter.n_batches, val_loss / validation.n_batches]),
+                                      self.labels)
+
+            # store snapshot
+            if snapshot == -1:
+                self.save_snapshot(epoch)
+
+            # if monitor is defined then run optional monitoring function
+            if monitor == -1:
+                map(lambda x: x.model.monitor.run() if x.model.monitor else None, self.agents)
 
             # store best models in case we are validating
             for i in range(self.n_agents):

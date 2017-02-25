@@ -52,12 +52,12 @@ class MLP(ChainList):
             if self.monitor:
 
                 h = self.actfun(self[0][0](x))
-                self.monitor.append('hidden-1', h.data)
+                self.monitor.set('hidden-1', h.data)
                 for i in range(1,self.n_hidden_layers):
                     h = self.actfun(self[0][i](h))
-                    self.monitor.append('hidden-'+str(i+1), h.data)
+                    self.monitor.set('hidden-'+str(i+1), h.data)
                 y = self[0][-1](h)
-                self.monitor.append('output', y.data)
+                self.monitor.set('output', y.data)
 
             else:
 
@@ -110,9 +110,9 @@ class ConvNet(Chain):
         if self.monitor:
 
             h = F.relu(self.l1(x))
-            self.monitor.append('hidden-1', h.data)
+            self.monitor.set('hidden-1', h.data)
             y = self.l2(h)
-            self.monitor.append('output', y.data)
+            self.monitor.set('output', y.data)
 
         else:
 
@@ -175,12 +175,12 @@ class RNN(ChainList):
             if self.monitor:
 
                 h = self[0][0](x)
-                self.monitor.append('hidden-1', h.data)
+                self.monitor.set('hidden-1', h.data)
                 for i in range(1,self.n_hidden_layers):
                     h = self[0][i](h)
-                    self.monitor.append('hidden-'+str(i+1), h.data)
+                    self.monitor.set('hidden-'+str(i+1), h.data)
                 y = self[0][-1](h)
-                self.monitor.append('output', y.data)
+                self.monitor.set('output', y.data)
 
             else:
 

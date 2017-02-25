@@ -36,10 +36,25 @@ class Model(Chain):
 
         serializers.save_npz('{}'.format(fname), self)
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, data, train=False):
+        """ Compute loss for minibatch of data
+
+        :param data: list of minibatches (e.g. inputs and targets for supervised learning)
+        :param train: call predictor in train or test mode
+        :return: loss
+        """
+
         raise NotImplementedError
 
-    def predict(self, x, train=False):
+    def predict(self, data, train=False):
+        """
+        Returns prediction, which can be different than raw output (e.g. for softmax function)
+
+        :param data: minibatch or list of minibatches representing input to the model
+        :param train: call predictor in train or test mode
+        :return: prediction
+        """
+
         raise NotImplementedError
 
 #####
@@ -54,28 +69,26 @@ class SupervisedModel(Model):
         self.loss_function = loss_function
         self.output_function = output_function
 
-    def __call__(self, x, t, train=False):
-        """
+    def __call__(self, data, train=False):
 
-        :param x: input
-        :param t: target output
-        :param train: call predictor in train or test mode
-        :return: loss
-        """
+        x = data[0] if len(data)==2 else data[:-1] # inputs
+        t = data[-1] # targets
 
         if self.monitor:
 
+            if isinstance(x, list):
+                self.monitor.set('input', np.hstack(map(lambda z: z.data, x)))
+            else:
+                self.monitor.set('input', x.data)
+
             y = self.predictor(x, train=train)
 
-            self.monitor.append('prediction',self.output_function(y).data)
+            self.monitor.set('prediction',self.output_function(y).data)
 
             loss = self.loss_function(y, t)
 
-            self.monitor.append('loss', loss.data)
-            self.monitor.append('target', t.data)
-
-            # run defined function
-            self.monitor.run()
+            self.monitor.set('loss', loss.data)
+            self.monitor.set('target', t.data)
 
             return loss
 
@@ -83,29 +96,25 @@ class SupervisedModel(Model):
 
             return self.loss_function(self.predictor(x, train), t)
 
-    def predict(self, x, train=False):
-        """
-        Returns prediction, which can be different than raw output (e.g. for softmax function)
-
-        :param x:
-        :param train: call predictor in train or test mode
-        :return: prediction
-        """
+    def predict(self, data, train=False):
 
         if self.monitor:
 
-            y = self.predictor(x, train=train)
-            output = self.output_function(y).data
-            self.monitor.append('prediction', output)
+            if isinstance(data, list):
+                self.monitor.set('input', np.hstack(map(lambda z: z.data, data)))
+            else:
+                self.monitor.set('input', data.data)
 
-            # run defined function
-            self.monitor.run()
+            y = self.predictor(data, train=train)
+            output = self.output_function(y).data
+
+            self.monitor.set('prediction', output)
 
             return output
 
         else:
 
-            return self.output_function(self.predictor(x, train)).data
+            return self.output_function(self.predictor(data, train)).data
 
 
 #####

@@ -7,10 +7,7 @@ class StatelessAgent(Agent):
 
     def run(self, data, train=True, idx=None, final=False):
 
-        x = Variable(self.xp.asarray([item[0] for item in data]))
-        t = Variable(self.xp.asarray([item[1] for item in data]))
-
-        loss = self.model(x, t, train=train)
+        loss = self.model(map(lambda x: Variable(self.xp.asarray(x)), data), train=train)
 
         # normalize by number of datapoints in minibatch
         _loss = float(loss.data/len(data))
@@ -44,10 +41,7 @@ class StatefulAgent(Agent):
 
     def run(self, data, train=True, idx=None, final=False):
 
-        x = Variable(self.xp.asarray([item[0] for item in data]))
-        t = Variable(self.xp.asarray([item[1] for item in data]))
-
-        loss = self.model(x, t, train=True)
+        loss = self.model(map(lambda x: Variable(self.xp.asarray(x)), data), train=True)
 
         if self.last:  # used in case we propagate back at end of trials only
             self.loss = loss

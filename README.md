@@ -67,6 +67,15 @@ The reset_state at the onset of each epoch ensures proper resetting. This requir
 n_batches to be set to the (fixed) number of time points of which each trial consists.
 Also requires that the data is organised as a concatenation of trials.
 
+How do I handle multiple inputs?
+
+* CMS has support for providing a list of datasets as input to a model.
+
+How do I plot intermediate results other than the loss?
+
+* Either define a monitor and set a monitor function (see test_hydranet example)
+or do it post hoc on snapshots of the model (see learning analysis example)
+
 ## TO DO
 
 * Add example of a task (data will be dependent on network action)
@@ -86,4 +95,3 @@ as possible, e.g. by moving part of this code to specific test cases
 Agents running on environments
 * World should be able to return losses
 * Allow input/output/anything visualizer during training; not just loss
-* allow handling of data of different tuple sizes

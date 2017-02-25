@@ -46,7 +46,7 @@ agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
 world = World(agent)
 
 # run world in training mode with validation - shows how to store snapshots each n iterations (instead of epochs)
-world.train(train_iter, n_epochs=n_epochs, plot=True, snapshot=10, per_epoch=False)
+world.train(train_iter, n_epochs=n_epochs, plot=-1, snapshot=10)
 
 # get snapshots
 snapshots = glob.glob(os.path.join(world.out, 'agent-0000-snapshot*'))

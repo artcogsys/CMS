@@ -3,21 +3,21 @@ import numpy as np
 
 class Monitor(object):
 
-    def __init__(self, names=None, function=None):
+    def __init__(self, names=None, append=True):
         """
 
         :param names: if defined then the name or list of names indicates keys to store
-        :param function: optional function that is applied after each processing cycle
+        :param append: if True, adds to list, otherwise assigns this value to dictionary
         """
 
         self._dict = defaultdict(list)
 
         self._names = [names] if names is str else names
 
-        self.function = function
+        self.append = append
 
 
-    def append(self, name, value):
+    def set(self, name, value):
         """
 
         :param name: dictionary key
@@ -26,7 +26,10 @@ class Monitor(object):
         """
 
         if self._names is None or name in self._names:
-            self._dict[name].append(value)
+            if self.append:
+                self._dict[name].append(value)
+            else:
+                self._dict[name] = [value]
 
     def keys(self):
         return self._dict.keys()
@@ -34,7 +37,7 @@ class Monitor(object):
     def get(self, name):
         """Returns dict[name] as numpy array
 
-        :param name: list of key names
+        :param name: key name
         :return: numpy array
         """
 
@@ -46,5 +49,8 @@ class Monitor(object):
             return data.reshape([np.prod(data.shape[:2])] + list(data.shape[2:]), order='F')
 
     def run(self):
-        if not self.function is None:
-            self.function()
+        """Run a function on the fly; implemented by inheriting from this monitor
+
+        :return:
+        """
+        pass

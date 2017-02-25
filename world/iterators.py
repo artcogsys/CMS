@@ -24,6 +24,11 @@ class Iterator(object):
         self.idx=0
 
     def next(self):
+        """
+
+        :return: a list of numpy arrays where the first dimension is the minibatch size
+        """
+
         raise NotImplementedError
 
     def is_final(self):
@@ -34,7 +39,7 @@ class Iterator(object):
         return ((self.idx+1)==self.n_batches)
 
 #####
-## Random iterator - returns random samples of a chainer dataset
+## Random iterator - returns random samples of a chainer TupleDataset
 
 class RandomIterator(Iterator):
 
@@ -68,10 +73,10 @@ class RandomIterator(Iterator):
 
         self.idx += 1
 
-        return [self.data[index] for index in self._order[i:(i + self.batch_size)]]
+        return list(self.data[self._order[i:(i + self.batch_size)]])
 
 #####
-## Sequential iterator - returns sequential samples of a chainer dataset
+## Sequential iterator - returns sequential samples of a chainer TupleDataset
 
 class SequentialIterator(Iterator):
 
@@ -110,4 +115,4 @@ class SequentialIterator(Iterator):
 
         self.idx += 1
 
-        return [self.data[index] for index in self._order[i:(i + self.batch_size)]]
+        return list(self.data[self._order[i:(i + self.batch_size)]])
