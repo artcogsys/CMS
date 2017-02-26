@@ -6,32 +6,16 @@ from tools import movie
 from agent.supervised import StatelessAgent
 from brain.models import *
 from brain.networks import *
-from chainer.datasets import TupleDataset
 from world.base import World
 from world.iterators import *
 import matplotlib.cm as cm
+from world.datasets import RegressionData
 
 # parameters
 n_epochs = 10
 
-# define dataset
-class MyDataset(TupleDataset):
-
-    def __init__(self):
-
-        X = np.random.rand(1000, 2).astype('float32')
-        T = np.vstack([np.sum(X, 1), np.prod(X, 1)]).transpose().astype('float32')
-
-        super(MyDataset, self).__init__(X, T)
-
-    def input(self):
-        return np.prod(self._datasets[0].shape[1:])
-
-    def output(self):
-        return np.prod(self._datasets[1].shape[1:])
-
 # define training environment
-train_iter = RandomIterator(MyDataset(), batch_size=32)
+train_iter = RandomIterator(RegressionData(), batch_size=32)
 
 # define brain of agent
 model = Regressor(MLP(train_iter.data.input(), train_iter.data.output(), n_hidden=10, n_hidden_layers=1))
@@ -52,7 +36,7 @@ world.train(train_iter, n_epochs=n_epochs, plot=-1, snapshot=10)
 snapshots = glob.glob(os.path.join(world.out, 'agent-0000-snapshot*'))
 
 # set data iterator
-test_iter = RandomIterator(MyDataset(), batch_size=32)
+test_iter = RandomIterator(RegressionData(), batch_size=32)
 
 # define function to apply to the monitor ran on the model
 def foo(monitor):

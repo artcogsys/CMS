@@ -9,12 +9,8 @@ from brain.networks import *
 from world.base import World
 from world.iterators import *
 from chainer.functions.connection import linear
-from world.datasets import MNISTData
+from world.datasets import ClassificationData
 
-# show that with this approach a perceptron can solve an xor problem
-# speed up via matrix decompositions
-# call function very slow
-# generalize to allow arbitrary contexts
 
 #####
 ## Define custom contextnet layer
@@ -147,12 +143,9 @@ class ContextMLP(ChainList, Network):
 # parameters
 n_epochs = 70
 
-train_data = MNISTData(test=False, convolutional=False, n_samples=100)
-val_data = MNISTData(test=True, convolutional=False, n_samples=100)
-
 # define training and validation environment
-train_iter = RandomIterator(train_data, batch_size=32)
-val_iter = RandomIterator(val_data, batch_size=32)
+train_iter = RandomIterator(ClassificationData(), batch_size=32)
+val_iter = RandomIterator(ClassificationData(), batch_size=32)
 
 # define agent 1
 model1 = Classifier(ContextMLP(train_iter.data.input(), train_iter.data.output(), n_hidden=10, n_hidden_layers=1))

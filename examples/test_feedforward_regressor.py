@@ -9,32 +9,16 @@ from agent.supervised import StatelessAgent
 from brain.models import *
 from brain.monitor import Monitor
 from brain.networks import *
-from chainer.datasets import TupleDataset
 from world.base import World
 from world.iterators import *
+from world.datasets import RegressionData
 
 # parameters
 n_epochs = 100
 
-# define dataset
-class MyDataset(TupleDataset):
-
-    def __init__(self):
-
-        X = np.random.rand(1000, 2).astype('float32')
-        T = np.vstack([np.sum(X, 1), np.prod(X, 1)]).transpose().astype('float32')
-
-        super(MyDataset, self).__init__(X, T)
-
-    def input(self):
-        return np.prod(self._datasets[0].shape[1:])
-
-    def output(self):
-        return np.prod(self._datasets[1].shape[1:])
-
 # define training and validation environment
-train_iter = RandomIterator(MyDataset(), batch_size=32)
-val_iter = RandomIterator(MyDataset(), batch_size=32)
+train_iter = RandomIterator(RegressionData(), batch_size=32)
+val_iter = RandomIterator(RegressionData(), batch_size=32)
 
 # define brain of agent
 model = Regressor(MLP(train_iter.data.input(), train_iter.data.output(), n_hidden=10, n_hidden_layers=1))
@@ -55,7 +39,7 @@ world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=-1)
 world.agents[0].model.add_monitor(Monitor())
 
 # run world in test mode
-world.test(SequentialIterator(MyDataset(), batch_size=1), n_epochs=1, plot=0)
+world.test(SequentialIterator(RegressionData(), batch_size=1), n_epochs=1, plot=0)
 
 # get variables
 Y = world.agents[0].model.monitor.get('prediction')

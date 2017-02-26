@@ -21,6 +21,7 @@ class Iterator(object):
         self.idx=0
 
     def __iter__(self):
+
         self.idx=0
 
     def next(self):

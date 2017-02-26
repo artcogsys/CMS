@@ -74,6 +74,9 @@ class SupervisedModel(Model):
         x = data[0] if len(data)==2 else data[:-1] # inputs
         t = data[-1] # targets
 
+        # check for missing data
+        # missing = [np.any(np.isnan(t[i].data)) or (t[i].data.dtype == 'int32' and np.any(t[i].data == -1)) for i in range(len(t.data))]
+
         if self.monitor:
 
             if isinstance(x, list):
@@ -93,7 +96,6 @@ class SupervisedModel(Model):
             return loss
 
         else:
-
             return self.loss_function(self.predictor(x, train), t)
 
     def predict(self, data, train=False):
