@@ -11,7 +11,6 @@ from world.iterators import *
 from chainer.functions.connection import linear
 from world.datasets import ClassificationData
 
-
 #####
 ## Define custom contextnet layer
 

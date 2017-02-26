@@ -155,6 +155,12 @@ class DRMIterator(Iterator):
 class DRMNet(ChainList, Network):
 
     def __init__(self, populations, readout):
+        """ Each population receives either sensory input or input from other populations.
+        This receival is mediated by connections which are neural networks themselves
+
+        :param populations:
+        :param readout:
+        """
 
         # build model
         links = ChainList()
@@ -170,7 +176,7 @@ class DRMNet(ChainList, Network):
         super(DRMNet, self).__init__(links)
 
     def __call__(self, x, train=False):
-        pass
+        raise NotImplementedError
 
 #####
 ## Neuronal population
@@ -190,11 +196,10 @@ class DRMPopulation(Chain, Network):
         )
 
     def __call__(self, x, train=False):
-
-        pass
+        raise NotImplementedError
 
     def reset_state(self):
-        pass
+        raise NotImplementedError
 
 #####
 ## Readout mechanism
@@ -209,8 +214,8 @@ class DRMReadout(Chain, Network):
         )
 
     def __call__(self, x, train=False):
-        pass
+        raise NotImplementedError
 
 
     def reset_state(self):
-        pass
+        raise NotImplementedError

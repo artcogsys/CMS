@@ -98,3 +98,4 @@ Agents running on environments
   Create generic monitor function; allow multiple monitors that also take
   care of snapshots, loss, throughput; define standard monitors; this
   makes comparison harder; since then each agent gets its own figure window
+* Create oscilloscope type monitors
