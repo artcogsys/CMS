@@ -1,4 +1,5 @@
-from drm import *
+from base import *
+from population import DRMPopulation
 
 # parameters
 n_epochs = 150
@@ -33,7 +34,7 @@ resp_time = np.arange(resp_offset,resp_offset + n_resp * resp_res, resp_res).tol
 # define iterator
 data_iter = DRMIterator(stimulus, response, resolution=1, stim_time=stim_time, resp_time=resp_time, batch_size=32)
 
-drm = DRM(data_iter, populations=[DRMPopulation() for i in range(n_pop)], readout=[DRMReadout() for i in range(n_out)])
+drm = DRM(data_iter, populations=[DRMPopulation() for i in range(n_pop)], Ws=None, Wp=None, Wr=None)
 
 drm.run()
 

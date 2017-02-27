@@ -7,55 +7,11 @@ from brain.models import *
 from brain.networks import *
 from world.base import World
 from world.iterators import *
+from connection import DRMConnection
+from population import DRMPopulation
 
 #####
-## DRM
-
-# focus: fast/scalable
-
-class DRM(object):
-
-    def __init__(self, data_iter, populations, readout, W_stim=None, W_pop=None, W_resp=None):
-        """
-
-        :param data_iter: iterator which generates sensations/responses at some specified resolution
-        :param populations: list of populations (neural networks)
-        :param readout: list of readout objects (neural networks)
-        :param resolution: temporal resolution for simulation in ms
-        :param stim_time: times as which stimuli were presented relative to start of simulation t=0
-        :param resp_time: times as which responses were observed relative to start of simulation t=0
-        :param W_stim: n_pop x n_stim matrix specifying how each input connects to each population (full if None)
-        :param W_pop: n_pop x n_pop matrix specifying how each population connects to each population (full if None)
-        :param W_resp: n_resp x n_pop matrix specifying how each population connects to each output (full if None)
-        """
-
-        self.data_iter = data_iter
-        self.populations = populations
-        self.n_in = self.data_iter.n_in
-        self.n_pop = len(populations)
-        self.n_out = self.data_iter.n_out
-        self.W_stim = W_stim or np.ones([self.n_pop,self.n_in], dtype=bool)
-        self.W_pop = W_pop or np.ones([self.n_pop,self.n_pop], dtype=bool)
-        self.W_resp = W_resp or np.ones([self.n_out,self.n_pop], dtype=bool)
-
-        self.model = Regressor(DRMNet(populations, readout))
-
-    def run(self):
-
-        # define agent
-        agent = StatefulAgent(self.model, chainer.optimizers.Adam())
-
-        # add hook
-        agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
-
-        # define world
-        world = World(agent)
-
-        # run world in training mode with validation
-        world.train(self.data_iter, n_epochs=100, plot=-1)
-
-#####
-## Sequential iterator
+## DRM iterator
 
 class DRMIterator(Iterator):
 
@@ -151,71 +107,96 @@ class DRMIterator(Iterator):
 
         return [stim_data, resp_data]
 
+#####
+## DRM
+
+# focus: fast/scalable
+
+class DRM(object):
+
+    def __init__(self, data_iter, populations, Ws=None, Wp=None, Wr=None):
+        """
+
+        :param data_iter: iterator which generates sensations/responses at some specified resolution
+        :param populations: list of populations (neural networks)
+        :param Ws: n_pop object array specifying a connection between the stimulus and each population.
+                NOTE: The stimulus is treated as a population itself
+                      Implies that the connection takes care of only looking at part of the input
+        :param Wp: npop x npop object array specifying a connection between all populations
+        :param Wr: n_resp object array specifying a readout mechanism for each internal population.
+                NOTE: The response is treated as a population itself.
+                      Implies that the connection takes care of specific readouts of e.g. one voxel
+        """
+
+        self.data_iter = data_iter
+
+        self.model = Regressor(DRMNet(populations, Ws, Wp, Wr))
+
+    def run(self):
+
+        # define agent
+        agent = StatefulAgent(self.model, chainer.optimizers.Adam())
+
+        # add hook
+        agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
+
+        # define world
+        world = World(agent)
+
+        # run world in training mode with validation
+        world.train(self.data_iter, n_epochs=100, plot=-1)
 
 class DRMNet(ChainList, Network):
 
-    def __init__(self, populations, readout):
+    def __init__(self, populations, Ws, Wp, Wr):
         """ Each population receives either sensory input or input from other populations.
-        This receival is mediated by connections which are neural networks themselves
+        This reception is mediated by connections which are neural networks themselves.
+        There are three kinds of connections: sensory-population, population-population, population-response
+        These all derive from the same object but we can have specific default implementations. Absent connections are
+        represented as None.
 
-        :param populations:
-        :param readout:
+        :param populations: npop list specifying each population
+        :param Ws: list specifying a connection between the stimulus and each population. NOTE: The stimulus is treated as a population itself
+        :param Wp: npop x npop object array specifying a connection between all populations
+        :param Wr: list specifying a readout mechanism for each internal population
         """
 
         # build model
         links = ChainList()
 
         # add populations
-        for i in range(len(populations)):
+        n_pop = len(populations)
+        for i in range(n_pop):
             links.add_link(populations[i])
 
-        # add readout mechanisms
-        for i in range(len(readout)):
-            links.add_link(readout[i])
+        ### add connections and inialize to defaults if needed
+
+        self.Ws = Ws or [DRMConnection() for i in range(n_pop)]
+
+        self.Wp = Wp or np.array([DRMPopulation() for i in range(n_pop*n_pop)]).reshape([n_pop, n_pop])
+
+        self.Wr = Wr or [DRMConnection() for i in range(n_pop)]
+
+        ### add links
+
+        for i in range(n_pop):
+            links.add_link(self.Ws[i])
+
+        for i in range(self.Wp.size):
+            links.add_link(np.ravel(self.Wp)[i])
+
+        for i in range(n_pop):
+            links.add_link(self.Wr[i])
 
         super(DRMNet, self).__init__(links)
 
     def __call__(self, x, train=False):
-        raise NotImplementedError
-
-#####
-## Neuronal population
-
-class DRMPopulation(Chain, Network):
-
-    def __init__(self, n_hidden=1, n_output=1):
         """
 
-        :param n_hidden: number of hidden units
-        :param n_output: number of outputs that are sent by this model
+        :param x: sensory input at this point in time (zeros for no input)
+        :param train: whether we are in train or test mode
+        :return:
         """
 
-        super(DRMPopulation, self).__init__(
-            l1=Elman(None, n_hidden),
-            l2=L.Linear(n_hidden, n_output)
-        )
-
-    def __call__(self, x, train=False):
         raise NotImplementedError
 
-    def reset_state(self):
-        raise NotImplementedError
-
-#####
-## Readout mechanism
-
-class DRMReadout(Chain, Network):
-
-    def __init__(self):
-
-        super(DRMReadout, self).__init__(
-            l1=L.LSTM(None, 1),
-            l2=L.Linear(1, 1)
-        )
-
-    def __call__(self, x, train=False):
-        raise NotImplementedError
-
-
-    def reset_state(self):
-        raise NotImplementedError
