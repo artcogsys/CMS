@@ -1,13 +1,21 @@
 from brain.networks import *
 
 #####
-## Default population - an identity mapping
+## Default population object - a chain object whose inputs and outputs don't need to match
 
 class DRMPopulation(Chain, Network):
+    """
+    An identity mapping
+    """
+
+    def __init__(self, n_output=1):
+
+        self.n_output = n_output
+
+        super(DRMPopulation, self).__init__()
 
     def __call__(self, x, train=False):
         return x
-
 
 
 # class DRMPopulation(Chain, Network):

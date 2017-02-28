@@ -2,21 +2,22 @@ from brain.networks import *
 
 #####
 ## Default readout mechanism
+# A chain object which takes all population outputs and translates this into measurements that can act as input to a regressor
 
 class DRMReadout(Chain, Network):
 
     def __init__(self, n_output):
         """
 
-        :param n_output: number of outputs that are sent by this model
+        :param n_output: number of outputs that are sent by this model (these are the measurements to be predicted)
         """
 
         super(DRMReadout, self).__init__(
-            l2=L.Linear(None, n_output)
+            l1=L.Linear(None, n_output)
         )
 
     def __call__(self, x, train=False):
-        raise NotImplementedError
+        return self.l1(x)
 
 
 

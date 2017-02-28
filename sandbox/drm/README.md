@@ -70,3 +70,7 @@ can allow the connection to learn the delay. Any >0 delay will do...
 * incorporate synaptic mechanisms (build models for this)
 * First problem to fix: how to implement a learnable or chosen conduction delay? tapped delay lines?
 Can we just push hidden states on a FIFO stack?
+* build learnable examples of readout mechanisms for meg, fmri, calcium imaging,  firing rate, spiking
+* and add cost functions on top
+* we can also build a plausible connectivity graph and then condition categorization on IT
+* replace n_output with output size everywhere
