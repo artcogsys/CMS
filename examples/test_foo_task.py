@@ -1,0 +1,71 @@
+# Foo task
+
+import random
+
+import matplotlib.cm as cm
+import scipy.stats as ss
+import tools as tools
+from agent.reinforcement import StatelessAgent
+from brain.models import *
+from brain.monitor import Monitor
+from brain.networks import *
+from world.base import World
+from world.iterators import *
+from world.tasks import Foo
+
+# parameters
+n_epochs = 150
+
+# define training and validation iterators
+train_iter = Foo(batch_size=32, n_batches = 100)
+val_iter = Foo(batch_size=32, n_batches = 100)
+
+# define brain of agent
+model = Regressor(MLP(train_iter.n_input, train_iter.n_output, n_hidden=10))
+
+# define agent
+agent = StatelessAgent(model, chainer.optimizers.Adam())
+
+# define world
+world = World(agent)
+
+# run world in training mode with validation
+world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=-1)
+
+# add monitor to model
+world.agents[0].model.add_monitor(Monitor())
+
+# run world in test mode
+world.test(Foo(batch_size=1, n_batches = 100), n_epochs=1, plot=0)
+
+# get variables
+Y = world.agents[0].model.monitor.get('prediction')
+T = world.agents[0].model.monitor.get('target')
+[n_samples, n_vars] = Y.shape
+
+
+# plot scatterplot
+
+fig = plt.figure()
+
+colors = cm.rainbow(np.linspace(0, 1, n_vars))
+regs = []
+for i in range(n_vars):
+    l = plt.scatter(T[:, i], Y[:, i], c=colors[i, :])
+    regs.append(l)
+    plt.hold('on')
+plt.axis('equal')
+plt.grid(True)
+plt.xlabel('Observed value')
+plt.ylabel('Predicted value')
+
+R = np.zeros([n_vars, 1])
+for i in range(n_vars):
+    R[i] = ss.pearsonr(np.squeeze(T[:, i]), np.squeeze(Y[:, i]))[0]
+plt.title('Scatterplot, <R>={0}'.format(np.mean(R)))
+
+plt.legend(tuple(regs),tuple(1+np.arange(n_vars)))
+
+tools.save_plot(fig, 'result', 'scatterplot')
+
+plt.close()

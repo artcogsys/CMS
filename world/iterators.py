@@ -22,7 +22,7 @@ class Iterator(object):
 
     def __iter__(self):
 
-        self.idx=0
+        self.idx = 0
 
     def next(self):
         """
@@ -117,3 +117,35 @@ class SequentialIterator(Iterator):
         self.idx += 1
 
         return list(self.data[self._order[i:(i + self.batch_size)]])
+
+
+#####
+## Task iterator - implements a task
+
+class TaskIterator(Iterator):
+    """
+    Iterator's next function returns an observation based on a previous action
+    """
+
+    def reset(self):
+        """
+        Reset environment to initial state and return observation
+
+        :return: observation
+        """
+
+        raise NotImplementedError
+
+    def act(self, action):
+        """
+        Act upon the environment
+
+        """
+
+        raise NotImplementedError
+
+    def render(self):
+        # render the environment
+
+        pass
+

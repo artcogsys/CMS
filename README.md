@@ -99,3 +99,4 @@ Agents running on environments
   care of snapshots, loss, throughput; define standard monitors; this
   makes comparison harder; since then each agent gets its own figure window
 * Create oscilloscope type monitors
+* Think about best integration between CMS and DRM
