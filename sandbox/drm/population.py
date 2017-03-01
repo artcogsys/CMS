@@ -8,9 +8,13 @@ class DRMPopulation(Chain, Network):
     An identity mapping
     """
 
-    def __init__(self, n_output=1):
+    def __init__(self, out_shape=1):
+        """
 
-        self.n_output = n_output
+        :param out_shape: shape of the output; required in base.py
+        """
+
+        self.out_shape = out_shape
 
         super(DRMPopulation, self).__init__()
 

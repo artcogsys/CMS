@@ -73,4 +73,4 @@ Can we just push hidden states on a FIFO stack?
 * build learnable examples of readout mechanisms for meg, fmri, calcium imaging,  firing rate, spiking
 * and add cost functions on top
 * we can also build a plausible connectivity graph and then condition categorization on IT
-* replace n_output with output size everywhere
+* replace n_output with output size everywhere to handle image data, convolutional output, etc

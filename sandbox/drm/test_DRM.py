@@ -44,10 +44,10 @@ data_iter = DRMIterator(stimulus, response, resolution=1, stim_time=stim_time, r
 # define model
 
 # standard populations
-populations = [DRMPopulation(n_output=1) for i in range(n_pop)]
+populations = [DRMPopulation(out_shape=1) for i in range(n_pop)]
 
 # standard readout mechanism
-readout = DRMReadout(n_output=n_out)
+readout = DRMReadout(out_shape=n_out)
 
 # setup model
 drm = DRM(data_iter, populations=populations, readout=readout, Ws=None, Wp=None, Wr=None)

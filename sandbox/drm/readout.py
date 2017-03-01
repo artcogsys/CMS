@@ -6,14 +6,14 @@ from brain.networks import *
 
 class DRMReadout(Chain, Network):
 
-    def __init__(self, n_output):
+    def __init__(self, out_shape):
         """
 
         :param n_output: number of outputs that are sent by this model (these are the measurements to be predicted)
         """
 
         super(DRMReadout, self).__init__(
-            l1=L.Linear(None, n_output)
+            l1=L.Linear(None, out_shape)
         )
 
     def __call__(self, x, train=False):

@@ -2,16 +2,17 @@ from brain.networks import *
 from chainer import Variable, Link
 
 #####
-## Default connection object - a chain object with and equal number of inputs and outputs
+## Default connection object
+# A chain object with and equal number of inputs and outputs
 
 class DRMConnection(Chain, Network):
     """
     A default connection performs an identity mapping
     """
 
-    def __init__(self, n_output=1):
+    def __init__(self, out_shape=1):
 
-        self.n_output = n_output
+        self.out_shape = out_shape
 
         super(DRMConnection, self).__init__()
 
