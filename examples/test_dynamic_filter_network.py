@@ -1,12 +1,10 @@
 # Implementation of a dynamic filter layer: De Brabandere, B., Jia, X., Tuytelaars, T., Van Gool, L., 2016. Dynamic Filter Networks.
 
-from chainer import initializers
 from agent.supervised import StatelessAgent
 from brain.models import *
 from brain.networks import *
 from world.base import World
-from world.iterators import *
-from world.datasets import ClassificationData
+from world.data import *
 from brain.links import DynamicFilterLinear
 
 #####

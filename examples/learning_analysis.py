@@ -7,9 +7,9 @@ from agent.supervised import StatelessAgent
 from brain.models import *
 from brain.networks import *
 from world.base import World
-from world.iterators import *
+from world.data import *
+import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from world.datasets import RegressionData
 
 # parameters
 n_epochs = 10

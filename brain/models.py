@@ -135,3 +135,60 @@ class Regressor(SupervisedModel):
 
     def __init__(self, predictor):
         super(Regressor, self).__init__(predictor=predictor, loss_function=F.mean_squared_error)
+
+
+#####
+## Reinforcement learning actor-critic model
+#
+
+class ActorCriticModel(Model):
+    """
+    An actor critic model computes the action, policy and value from a predictor
+    """
+
+    def __init__(self, predictor, output_function=lambda x:x):
+        super(ActorCriticModel, self).__init__(predictor=predictor)
+
+        self.output_function = output_function
+
+    def __call__(self, data, train=False):
+        """
+
+        :param data: observation
+        :param train: True or False
+        :return: policy and value
+        """
+
+        # separate observation from reward
+        x = data[0] if len(data) == 2 else data[:-1]  # inputs
+
+        # linear outputs reflecting the log action probabilities and the value
+        out = self.predictor(x, train)
+
+        policy = out[:,:-1]
+
+        value = out[:,-1]
+
+        # handle case where we have only one element per batch
+        if value.ndim == 1:
+            value = F.expand_dims(value, axis=1)
+
+        # generate action according to policy
+        p = F.softmax(policy).data[0]
+
+        # normalize p in case tiny floating precision problems occur
+        p = p.astype('float32')
+        p /= p.sum()
+
+        # discrete representation
+        n_out = self.predictor.n_output-1
+        action = np.random.choice(n_out, None, True, p)
+
+        return action, policy, value
+
+    def predict(self, data, train=False):
+
+        pi = self.predictor(data, train)[:,:-1]
+
+        return self.output_function(pi).data
+

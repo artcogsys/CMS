@@ -7,9 +7,8 @@ from agent.supervised import StatelessAgent
 from brain.models import *
 from brain.networks import *
 from world.base import World
-from world.iterators import *
+from world.data import *
 from chainer.functions.connection import linear
-from world.datasets import ClassificationData
 
 #####
 ## Define custom contextnet layer

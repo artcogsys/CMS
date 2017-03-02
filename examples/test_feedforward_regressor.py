@@ -10,8 +10,7 @@ from brain.models import *
 from brain.monitor import Monitor
 from brain.networks import *
 from world.base import World
-from world.iterators import *
-from world.datasets import RegressionData
+from world.data import *
 
 # parameters
 n_epochs = 100

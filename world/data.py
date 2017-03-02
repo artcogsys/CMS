@@ -1,8 +1,92 @@
+from __future__ import division
+
+from base import Iterator
 import numpy as np
 import random
 import chainer
 import itertools
 from chainer.datasets import *
+
+## Contains iterators that operate on datasets and default datasets
+
+#####
+## Random iterator - returns random samples of a chainer TupleDataset
+
+class RandomIterator(Iterator):
+
+    def __init__(self, data, batch_size=None, n_batches=None):
+
+        self.data = data
+
+        if batch_size is None:
+            batch_size = 1
+
+        if n_batches is None:
+            n_batches = len(self.data) // batch_size
+
+        super(RandomIterator, self).__init__(batch_size=batch_size, n_batches=n_batches)
+
+        assert (self.n_batches * self.batch_size <= len(self.data))
+
+    def __iter__(self):
+
+        self.idx = 0
+        self._order = np.random.permutation(len(self.data))[:(self.n_batches * self.batch_size)]
+
+        return self
+
+    def next(self):
+
+        if self.idx == self.n_batches:
+            raise StopIteration
+
+        i = self.idx * self.batch_size
+
+        self.idx += 1
+
+        return list(self.data[self._order[i:(i + self.batch_size)]])
+
+#####
+## Sequential iterator - returns sequential samples of a chainer TupleDataset
+
+class SequentialIterator(Iterator):
+
+    def __init__(self, data, batch_size=None, n_batches=None):
+
+        self.data = data
+
+        if batch_size is None:
+            batch_size = 1
+
+        if n_batches is None:
+            n_batches = len(self.data) // batch_size
+
+        super(SequentialIterator, self).__init__(batch_size=batch_size, n_batches=n_batches)
+
+    def __iter__(self):
+
+        self.idx = 0
+
+        offsets = [i * self.n_batches for i in range(self.batch_size)]
+
+        # define custom ordering; we won't process beyond the end of the trial
+        self._order = []
+        for iter in range(self.n_batches):
+            x = [(offset + iter) % len(self.data) for offset in offsets]
+            self._order += x
+
+        return self
+
+    def next(self):
+
+        if self.idx == self.n_batches:
+            raise StopIteration
+
+        i = self.idx * self.batch_size
+
+        self.idx += 1
+
+        return list(self.data[self._order[i:(i + self.batch_size)]])
 
 
 #####

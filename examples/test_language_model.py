@@ -4,8 +4,7 @@ from agent.supervised import StatefulAgent
 from brain.models import *
 from brain.networks import *
 from world.base import World
-from world.iterators import *
-from world.datasets import PTBCharData
+from world.data import *
 
 # parameters
 n_epochs = 100

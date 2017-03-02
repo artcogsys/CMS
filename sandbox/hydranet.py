@@ -1,7 +1,6 @@
 # example of life-long learning with hydranet
 
-import chainer
-from world.iterators import *
+from world.data import *
 from agent.supervised import StatefulAgent
 from brain.models import Regressor
 from chainer.datasets import *

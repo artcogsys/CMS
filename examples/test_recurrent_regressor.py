@@ -1,7 +1,5 @@
 # Toy dataset for dynamic regression data
 
-import random
-
 import matplotlib.cm as cm
 import scipy.stats as ss
 import tools as tools
@@ -10,8 +8,8 @@ from brain.models import *
 from brain.monitor import Monitor
 from brain.networks import *
 from world.base import World
-from world.iterators import *
-from world.datasets import RegressionTimeseries
+from world.data import *
+import matplotlib.pyplot as plt
 
 # parameters
 n_epochs = 150
@@ -45,7 +43,6 @@ world.test(SequentialIterator(RegressionTimeseries(), batch_size=1), n_epochs=1,
 Y = world.agents[0].model.monitor.get('prediction')
 T = world.agents[0].model.monitor.get('target')
 [n_samples, n_vars] = Y.shape
-
 
 # plot scatterplot
 

@@ -104,9 +104,9 @@ class ConvNet(Chain, Network):
             l2=L.Linear(n_linear, n_output)
         )
 
-        self.ninput = n_input
-        self.nhidden = n_hidden
-        self.noutput = n_output
+        self.n_input = n_input
+        self.n_hidden = n_hidden
+        self.n_output = n_output
         self.monitor = None
 
     def __call__(self, x, train=False):
@@ -160,9 +160,9 @@ class RNN(ChainList, Network):
                 links.add_link(link(n_hidden, n_hidden))
             links.add_link(L.Linear(n_hidden, n_output))
 
-        self.ninput = n_input
-        self.nhidden = n_hidden
-        self.noutput = n_output
+        self.n_input = n_input
+        self.n_hidden = n_hidden
+        self.n_output = n_output
         self.n_hidden_layers = n_hidden_layers
         self.monitor = None
 
@@ -225,3 +225,74 @@ class RNNForLM(Chain, Network):
 
     def reset_state(self):
         self.l1.reset_state()
+
+# #####
+# ## Actor-critic model
+#
+# class ACElman(Chain):
+#     """
+#     Implements an actor-critic model based on an Elman network
+#     """
+#
+#     def __init__(self, n_input, n_hidden, n_output):
+#         super(ACElman, self).__init__(
+#             l1_pi=Elman(n_input, n_hidden),
+#             l1_v=Elman(n_input, n_hidden),
+#             pi=L.Linear(n_hidden, n_output),
+#             v=L.Linear(n_hidden, 1),
+#         )
+#
+#         self.ninput = n_input
+#         self.nhidden = n_hidden
+#         self.noutput = n_output
+#
+#     def __call__(self, x):
+#
+#         h_pi = self.l1_pi(x)
+#         h_v = self.l1_v(x)
+#
+#         pi = self.pi(h_pi)
+#         v = self.v(h_v)
+#
+#         return pi, v
+#
+#     def reset(self):
+#         self.l1_pi.reset_state()
+#         self.l1_v.reset_state()
+#
+#     def get_persistent(self):
+#         return [self.l1_pi.h, self.l1_v.h]
+#
+#     def set_persistent(self, x):
+#         self.l1_pi.h = x[0]
+#         self.l1_v.h = x[1]
+#
+#     def action(self, obs):
+#         """
+#         Generate action
+#
+#         :param obs:
+#         :return: action, pi, v, internal
+#         """
+#
+#         pi, v, internal = self(obs)
+#
+#         # generate action according to policy
+#         p = F.softmax(pi).data[0]
+#
+#         # normalize p in case tiny floating precision problems occur
+#         p = p.astype('float32')
+#         p /= p.sum()
+#
+#         # one-out-of-K representation
+#         idx = np.random.choice(self.noutput, None, True, p)
+#         action = np.zeros(self.noutput)
+#         action[idx] = 1.0
+#
+#         return action, pi, v, internal
+#
+#     def unchain_backward(self):
+#         if not self.l1_pi.h is None:
+#             self.l1_pi.h.unchain_backward()
+#         if not self.l1_v.h is None:
+#             self.l1_v.h.unchain_backward()

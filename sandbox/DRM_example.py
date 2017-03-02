@@ -2,7 +2,6 @@
 # 'representations'. Each neural population has its own (set of) RNN units. Each population projects to one output
 # variable (e.g. its BOLD response).
 
-import random
 import matplotlib.cm as cm
 import scipy.stats as ss
 import tools as tools
@@ -10,9 +9,8 @@ from agent.supervised import StatefulAgent
 from brain.models import *
 from brain.monitor import Monitor
 from brain.networks import *
-from chainer.datasets import TupleDataset
 from world.base import World
-from world.iterators import *
+from world.data import *
 
 #####
 ## DRM

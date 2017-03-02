@@ -7,6 +7,51 @@ import tqdm
 import tools
 
 #####
+## An iterator generates batches
+
+class Iterator(object):
+
+    def __init__(self, batch_size=None, n_batches=None):
+
+        self.batch_size = batch_size
+        self.n_batches = n_batches
+
+        # index of current batch
+        self.idx=0
+
+    def __iter__(self):
+
+        self.idx = 0
+
+        return self
+
+    def next(self):
+        """
+
+        :return: a list of numpy arrays where the first dimension is the minibatch size
+        """
+
+        raise NotImplementedError
+
+    def is_final(self):
+        """
+
+        :return: boolean if final batch is reached
+        """
+        return ((self.idx+1)==self.n_batches)
+
+    def process(self, agent):
+        """
+        Processing the possible actions of an agent
+        By default this has no effect
+
+        :param agent:
+        :return:
+        """
+
+        pass
+
+#####
 ## World class
 
 class World(object):
@@ -61,7 +106,12 @@ class World(object):
             # iterate over batches
             for data in data_iter:
 
+                # loss is the cost we wish to minimize
                 losses = map(lambda x: x.run(data, train=train, idx=data_iter.idx, final=data_iter.is_final()), self.agents)
+
+                # the iterator can process actions of the agents that change the state of the iterator
+                # used in case of processing of tasks by RL agents
+                map(lambda x: data_iter.process(x), self.agents)
 
                 idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
 
@@ -98,10 +148,10 @@ class World(object):
             self.agents[i].model.save(os.path.join(self.out, 'agent-{0:04d}-snapshot-{1:04d}'.format(i, idx)))
 
     def train(self, data_iter, n_epochs=1, plot=0, snapshot=0, monitor=0):
-        self.run(data_iter, True, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
+        self.run(data_iter, train=True, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
 
     def test(self, data_iter, n_epochs=1, plot=0, snapshot=0, monitor=0):
-        self.run(data_iter, False, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
+        self.run(data_iter, train=False, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
 
     def validate(self, data_iter, validation, n_epochs=1, plot=0, snapshot=0, monitor=0):
         """ Used to train a model and test it such as to determine the best model; this model will become
@@ -135,6 +185,10 @@ class World(object):
 
                 losses = map(lambda x: x.run(data, train=True, idx=data_iter.idx, final=data_iter.is_final()), self.agents)
 
+                # the iterator can process actions of the agents that change the state of the iterator
+                # used in case of processing of tasks by RL agents
+                map(lambda x: data_iter.process(x), self.agents)
+
                 idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
 
                 if plot > 0 and idx % plot == 0:
@@ -156,7 +210,11 @@ class World(object):
             val_loss = np.zeros(self.n_agents)
 
             for data in validation:
+
                 losses = map(lambda x: x.run(data, train=False), self.agents)
+
+                map(lambda x: data_iter.process(x), self.agents)
+
                 val_loss += losses
 
             # plot cumulative loss averaged over number of batches of each agent

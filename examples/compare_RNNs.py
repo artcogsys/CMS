@@ -3,10 +3,9 @@
 from agent.supervised import StatefulAgent
 from brain.models import *
 from brain.networks import *
-from world.iterators import *
+from world.data import *
 from world.base import World
 from brain.links import Elman
-from world.datasets import RegressionTimeseries
 
 # parameters
 n_epochs = 150

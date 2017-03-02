@@ -7,8 +7,7 @@ from brain.models import *
 from brain.monitor import Monitor
 from brain.networks import *
 from world.base import World
-from world.datasets import CIFARData
-from world.iterators import *
+from world.data import *
 
 #####
 ## Delay iterator - a trial iterator that spits out the same datapoint n_batch times

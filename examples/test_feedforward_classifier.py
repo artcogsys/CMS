@@ -8,8 +8,8 @@ from brain.models import *
 from brain.monitor import Monitor
 from brain.networks import *
 from world.base import World
-from world.iterators import *
-from world.datasets import ClassificationData
+from world.data import *
+import matplotlib.pyplot as plt
 
 # parameters
 n_epochs = 100

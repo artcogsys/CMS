@@ -6,7 +6,7 @@ from agent.supervised import StatefulAgent
 from brain.models import *
 from brain.networks import *
 from world.base import World
-from world.iterators import *
+from world.data import *
 from connection import DRMConnection
 from population import DRMPopulation
 from readout import DRMReadout

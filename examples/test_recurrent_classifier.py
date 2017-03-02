@@ -1,7 +1,5 @@
 # Toy dataset for dynamic classification data
 
-import random
-
 import matplotlib.pyplot as plt
 import tools as tools
 from agent.supervised import StatefulAgent
@@ -9,8 +7,7 @@ from brain.models import *
 from brain.monitor import Monitor
 from brain.networks import *
 from world.base import World
-from world.iterators import *
-from world.datasets import ClassificationTimeseries
+from world.data import *
 
 # parameters
 n_epochs = 150

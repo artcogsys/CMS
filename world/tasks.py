@@ -1,5 +1,40 @@
-from iterators import TaskIterator
+from base import Iterator
 import numpy as np
+
+
+#####
+## Task iterator - implements a task
+
+class TaskIterator(Iterator):
+    """
+    Iterator's next function returns an observation based on a previous action.
+    A task iterator should return at each next step a new observation and the reward
+    based on the previously taken action.
+    """
+
+    def reset(self):
+        """
+        Reset environment to initial state and return observation
+
+        :return: observation
+        """
+
+        raise NotImplementedError
+
+    def process(self, agent):
+        """
+        Implements how an agent acts upon the environment
+
+        """
+
+        raise NotImplementedError
+
+    def render(self):
+        # render the environment
+
+        pass
+
+
 
 ###
 # Specific environments
@@ -24,6 +59,8 @@ class Foo(TaskIterator):
         self.n_input = n
         self.p = p
 
+        self.reward = 0 # initial reward
+
         self.n_action = 1 # number of action variables
         self.n_output = 2 # number of output variables for the agent (discrete case)
         self.n_states = 1 # number of state variables
@@ -44,25 +81,33 @@ class Foo(TaskIterator):
         if self.state == 0:
             p = 1 - p
 
-        obs = np.random.choice(2, [1, self.n_input], True, p)
+        self.obs = np.random.choice(2, [1, self.n_input], True, p).astype(np.float32)
 
-        # the action that was performed by the agent
-        self.action = None
+    def __iter__(self):
 
-        return obs.astype(np.float32)
+        self.idx = 0
+
+        self.reset()
+
+        return self
 
     def next(self):
 
         if self.idx == self.n_batches:
             raise StopIteration
 
+        self.idx += 1
+
+        return self.obs, self.reward
+
+    def process(self, agent):
+
         # reward is +1 or -1
-        reward = 2 * int(self.action == self.state) - 1
+        self.reward = 2 * int(agent.action == self.state) - 1
 
         # this task always produces a new observation after each decision
-        obs = self.reset()
+        self.reset()
 
-        return obs, reward
 
     # def get_ground_truth(self):
     #     """

@@ -5,11 +5,10 @@ from brain.models import *
 from brain.monitor import Monitor
 from brain.networks import *
 from world.base import World
-from world.datasets import MNISTData
-from world.iterators import *
+from world.data import *
 
 # parameters
-n_epochs = 50
+n_epochs = 10
 
 # get training and validation data - note that we select a subset of datapoints
 train_data = MNISTData(test=False, convolutional=True, n_samples=100)

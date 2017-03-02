@@ -10,9 +10,10 @@ class StatelessAgent(Agent):
         loss = self.model(map(lambda x: Variable(self.xp.asarray(x)), data), train=train)
 
         # normalize by number of datapoints in minibatch
-        _loss = float(loss.data/len(data))
+        _loss = float(loss.data/data[0].shape[0])
 
         if train:
+
             self.optimizer.zero_grads()
             loss.backward()
             self.optimizer.update()
@@ -31,12 +32,7 @@ class StatefulAgent(Agent):
         # whether to update from loss in last step only
         self.last = last
 
-        # required for BPTT
-
-        # keep track of current index for
-        self.idx = 0
-
-        # keep track of loss for truncated BP
+        # keep track of loss for truncated BPTT
         self.loss = Variable(self.xp.zeros((), 'float32'))
 
     def run(self, data, train=True, idx=None, final=False):
@@ -48,7 +44,8 @@ class StatefulAgent(Agent):
         else:
             self.loss += loss
 
-        _loss = float(loss.data / len(data))
+        # normalize by number of datapoints in minibatch
+        _loss = float(loss.data / data[0].shape[0])
 
         # backpropagate if we reach the cutoff for truncated backprop or if we processed the last batch
         if train and ((self.cutoff and (idx % self.cutoff) == 0) or final):
