@@ -14,9 +14,9 @@ class Monitor(object):
         :param len: determines the length of the monitor; stores the last len items at most
         """
 
-        self._dict = defaultdict(list)
+        self.dict = defaultdict(list)
 
-        self._names = [names] if names is str else names
+        self.names = [names] if names is str else names
 
         self.len = len
 
@@ -28,17 +28,17 @@ class Monitor(object):
         :return:
         """
 
-        if self._names is None or name in self._names:
+        if self.names is None or name in self.names:
             if self.len==1:
-                self._dict[name] = [value]
+                self.dict[name] = [value]
             else:
-                if self._dict[name] == self.len:
-                    self._dict[name] = self._dict[name][1:].append(value)
+                if self.dict[name] == self.len:
+                    self.dict[name] = self.dict[name][1:].append(value)
                 else:
-                    self._dict[name].append(value)
+                    self.dict[name].append(value)
 
     def keys(self):
-        return self._dict.keys()
+        return self.dict.keys()
 
     def __getitem__(self, item):
         """Returns dict[name] as numpy array
@@ -48,7 +48,7 @@ class Monitor(object):
         """
 
         assert(item in self.keys())
-        data = np.asarray(self._dict[item])
+        data = np.asarray(self.dict[item])
         if data.ndim <=2:
             return data.reshape([np.prod(data.shape)], order='F')
         else:
@@ -69,11 +69,9 @@ class Oscilloscope(Monitor):
 
     def __init__(self, names=None, len=np.inf):
 
-        # 't' is used to index the time
         super(Oscilloscope, self).__init__(names, len)
 
-        self.fig = []
-        self.ax = []
+        self.fig = self.ax = self.hl = None
 
     def run(self):
 
@@ -81,22 +79,17 @@ class Oscilloscope(Monitor):
 
         keys = self.keys()
 
-        if self.fig == []:
+        if self.fig is None:
 
-            self.hl = [None] * len(keys)
-
+            self.fig, self.ax = plt.subplots()
+            self.ax.set_xlabel('t')
+            #self.ax.set_ylabel('loss')
+            self.hl = np.empty(len(keys), dtype=object)
             for i in range(len(keys)):
-
-                f, a = plt.subplots()
-                self.fig.append(f)
-                self.ax.append(a)
-
                 key = self.keys()[i]
-
-                self.hl[i], = self.ax[i].plot(np.arange(self[key].size), self[key])
-                self.ax[i].set_title(key)
-
-                f.show()
+                self.hl[i], = self.ax.plot(np.arange(self[key].size), self[key])
+            self.fig.legend(self.hl, tuple(self.names))
+            self.fig.show()
 
         else:
 
@@ -104,7 +97,11 @@ class Oscilloscope(Monitor):
                 key = self.keys()[i]
                 self.hl[i].set_xdata(np.arange(self[key].size))
                 self.hl[i].set_ydata(self[key])
-                self.ax[i].relim()
-                self.ax[i].autoscale_view()
-                self.fig[i].canvas.draw()
-                self.fig[i].canvas.flush_events()
+            self.ax.relim()
+            self.ax.autoscale_view()
+            self.fig.canvas.draw()
+            self.fig.canvas.flush_events()
+
+    def save(self, fname):
+        self.fig.savefig(fname)
+        plt.close()

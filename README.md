@@ -59,6 +59,14 @@ A monitor is used to monitor the internal states of either a model or a
 predictor. It is also used to monitor the past states of an RL agent
 to allow RL updating.
 
+A monitor can be added to an agent, model or predictor. If added to an
+agent then it will add automatically to model and predictor. We allow
+multiple monitors that each fulfills a specific function
+
+Types of monitors:
+* Monitor (generic)
+* Oscilloscope (plots one or more variables within a plot window)
+
 #### Networks
 
 Networks are predictors that take input and produce output.
@@ -159,3 +167,7 @@ Agents running on environments
 * Handle initial observations/rewards
 * make REINFORCE standalone agent
 * fix learning_analysis movie generation
+* make loss plot dependent on oscilloscope;
+  add multiple monitors; oscilloscope plots multiple things in same window
+* Allow multiple inheritance for networks so we dont need to set monitor each time
+* finish base class loss plot; run test_foo; cleanup base wrt validation part

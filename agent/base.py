@@ -28,12 +28,12 @@ class Agent(object):
 
         self.reset()
 
-        self.monitor = None
+        self.monitor = []
 
     def add_monitor(self, monitor):
 
         # used to store computed states
-        self.monitor = monitor
+        self.monitor.append(monitor)
         self.model.add_monitor(monitor)
 
     def reset(self):

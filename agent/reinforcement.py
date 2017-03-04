@@ -83,7 +83,7 @@ class REINFORCEAgent(ActorCriticAgent):
 
             # store return
             if self.monitor:
-                self.monitor.set('return', np.mean(self._return.data))
+                map(lambda x: x.set('return', np.mean(self._return.data)), self.monitor)
 
             self._return = None
 

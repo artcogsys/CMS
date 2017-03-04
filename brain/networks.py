@@ -9,7 +9,7 @@ class Network(object):
     def add_monitor(self, monitor):
 
         # used to store computed states
-        self.monitor = monitor
+        self.monitor.append(monitor)
 
     def reset_state(self):
         pass
@@ -47,7 +47,7 @@ class MLP(ChainList, Network):
         self.n_output = n_output
         self.n_hidden_layers = n_hidden_layers
         self.actfun = actfun
-        self.monitor = None
+        self.monitor = []
 
         super(MLP, self).__init__(links)
 
@@ -62,12 +62,12 @@ class MLP(ChainList, Network):
             if self.monitor:
 
                 h = self.actfun(self[0][0](x))
-                self.monitor.set('hidden-1', h.data)
+                map(lambda x: x.set('hidden-1', h.data), self.monitor)
                 for i in range(1,self.n_hidden_layers):
                     h = self.actfun(self[0][i](h))
-                    self.monitor.set('hidden-'+str(i+1), h.data)
+                    map(lambda x: x.set('hidden-'+str(i+1), h.data), self.monitor)
                 y = self[0][-1](h)
-                self.monitor.set('output', y.data)
+                map(lambda x: x.set('output', y.data), self.monitor)
 
             else:
 
@@ -107,7 +107,7 @@ class ConvNet(Chain, Network):
         self.n_input = n_input
         self.n_hidden = n_hidden
         self.n_output = n_output
-        self.monitor = None
+        self.monitor = []
 
     def __call__(self, x, train=False):
         """
@@ -117,9 +117,9 @@ class ConvNet(Chain, Network):
         if self.monitor:
 
             h = F.relu(self.l1(x))
-            self.monitor.set('hidden-1', h.data)
+            map(lambda x: x.set('hidden-1', h.data), self.monitor)
             y = self.l2(h)
-            self.monitor.set('output', y.data)
+            map(lambda x: x.set('output', y.data), self.monitor)
 
         else:
 
@@ -164,7 +164,7 @@ class RNN(ChainList, Network):
         self.n_hidden = n_hidden
         self.n_output = n_output
         self.n_hidden_layers = n_hidden_layers
-        self.monitor = None
+        self.monitor = []
 
         super(RNN, self).__init__(links)
 
@@ -179,12 +179,12 @@ class RNN(ChainList, Network):
             if self.monitor:
 
                 h = self[0][0](x)
-                self.monitor.set('hidden-1', h.data)
+                map(lambda x: x.set('hidden-1', h.data), self.monitor)
                 for i in range(1,self.n_hidden_layers):
                     h = self[0][i](h)
-                    self.monitor.set('hidden-'+str(i+1), h.data)
+                    map(lambda x: x.set('hidden-'+str(i+1), h.data), self.monitor)
                 y = self[0][-1](h)
-                self.monitor.set('output', y.data)
+                map(lambda x: x.set('output', y.data), self.monitor)
 
             else:
 
@@ -215,7 +215,7 @@ class RNNForLM(Chain, Network):
         for param in self.params():
             param.data[...] = np.random.uniform(-0.1, 0.1, param.data.shape)
 
-        self.monitor = None
+        self.monitor = []
 
     def __call__(self, x, train=False):
 

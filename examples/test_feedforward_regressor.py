@@ -41,8 +41,8 @@ agent.add_monitor(Monitor())
 world.test(SequentialIterator(RegressionData(), batch_size=1), n_epochs=1, plot=0)
 
 # get variables
-Y = agent.monitor['prediction']
-T = agent.monitor['target']
+Y = agent.monitor[0]['prediction']
+T = agent.monitor[0]['target']
 [n_samples, n_vars] = Y.shape
 
 # plot scatterplot

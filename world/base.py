@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tqdm
 import tools
+from brain.monitor import Oscilloscope
 
 #####
 ## An iterator generates batches
@@ -101,7 +102,8 @@ class World(object):
         :return:
         """
 
-        gfx = None
+        if plot:
+            loss_monitor = Oscilloscope(['train loss'])
 
         # iterate over epochs
         for epoch in tqdm.tqdm(xrange(0, n_epochs)):
@@ -124,7 +126,8 @@ class World(object):
                 idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
 
                 if plot > 0 and idx % plot == 0:
-                    gfx = tools.plot_loss(gfx, idx, losses, self.labels)
+                    loss_monitor.set('train loss', losses)
+                    loss_monitor.run()
 
                 if snapshot > 0 and idx % snapshot == 0:
                     self.save_snapshot(idx)
@@ -136,8 +139,8 @@ class World(object):
                 cum_loss += losses
 
             if plot == -1:
-                # plot cumulative loss averaged over number of batches of each agent
-                gfx = tools.plot_loss(gfx, epoch, cum_loss / data_iter.n_batches, self.labels)
+                loss_monitor.set('train loss', cum_loss / data_iter.n_batches)
+                loss_monitor.run()
 
             # store snapshot
             if snapshot == -1:
@@ -147,9 +150,8 @@ class World(object):
             if monitor == -1:
                 map(lambda x: x.monitor.run() if x.model.monitor else None, self.agents)
 
-        if plot and gfx[0]:
-            gfx[0].savefig(os.path.join(self.out, 'loss'))
-            plt.close()
+        if plot:
+            loss_monitor.save(os.path.join(self.out, 'loss'))
 
     def save_snapshot(self, idx):
         for i in range(self.n_agents):
@@ -174,7 +176,8 @@ class World(object):
         :return:
         """
 
-        gfx = None
+        if plot:
+            loss_monitor = Oscilloscope(['train loss', 'validation loss'])
 
         # initialization
         min_loss = [None] * self.n_agents
@@ -200,7 +203,8 @@ class World(object):
                 idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
 
                 if plot > 0 and idx % plot == 0:
-                    gfx = tools.plot_loss(gfx, idx, losses, self.labels)
+                    loss_monitor.set('train loss', losses)
+                    loss_monitor.run()
 
                 if snapshot > 0 and idx % snapshot == 0:
                     self.save_snapshot(idx)
@@ -227,9 +231,9 @@ class World(object):
 
             # plot cumulative loss averaged over number of batches of each agent
             if plot == -1:
-                gfx = tools.plot_loss(gfx, epoch,
-                                      np.concatenate([cum_loss / data_iter.n_batches, val_loss / validation.n_batches]),
-                                      self.labels)
+                loss_monitor.set('train loss', cum_loss / data_iter.n_batches)
+                loss_monitor.set('validation loss', val_loss / validation.n_batches)
+                loss_monitor.run()
 
             # store snapshot
             if snapshot == -1:
@@ -255,6 +259,5 @@ class World(object):
             self.agents[i].model = optimal_model[i]
             self.agents[i].optimizer.target = optimal_model[i]
 
-        if plot and gfx[0]:
-            gfx[0].savefig(os.path.join(self.out, 'loss'))
-            plt.close()
+        if plot:
+            loss_monitor.save(os.path.join(self.out, 'loss'))

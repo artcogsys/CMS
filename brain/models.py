@@ -16,12 +16,12 @@ class Model(Chain):
     def __init__(self, predictor):
         super(Model, self).__init__(predictor=predictor)
 
-        self.monitor = None
+        self.monitor = []
 
     def add_monitor(self, monitor):
 
         # used to store computed states
-        self.monitor = monitor
+        self.monitor.append(monitor)
         self.predictor.add_monitor(monitor)
 
     def load(self, fname):
@@ -80,18 +80,18 @@ class SupervisedModel(Model):
         if self.monitor:
 
             if isinstance(x, list):
-                self.monitor.set('input', np.hstack(map(lambda z: z.data, x)))
+                map(lambda v: v.set('input', np.hstack(map(lambda z: z.data, x))), self.monitor)
             else:
-                self.monitor.set('input', x.data)
+                map(lambda v: v.set('input', x.data), self.monitor)
 
             y = self.predictor(x, train=train)
 
-            self.monitor.set('prediction',self.output_function(y).data)
+            map(lambda x: x.set('prediction',self.output_function(y).data), self.monitor)
 
             loss = self.loss_function(y, t)
 
-            self.monitor.set('loss', loss.data)
-            self.monitor.set('target', t.data)
+            map(lambda x: x.set('loss', loss.data), self.monitor)
+            map(lambda x: x.set('target', t.data), self.monitor)
 
             return loss
 
@@ -103,14 +103,14 @@ class SupervisedModel(Model):
         if self.monitor:
 
             if isinstance(data, list):
-                self.monitor.set('input', np.hstack(map(lambda z: z.data, data)))
+                map(lambda v: v.set('input', np.hstack(map(lambda z: z.data, data))), self.monitor)
             else:
-                self.monitor.set('input', data.data)
+                map(lambda v: v.set('input', data.data), self.monitor)
 
             y = self.predictor(data, train=train)
             output = self.output_function(y).data
 
-            self.monitor.set('prediction', output)
+            map(lambda x: x.set('prediction', output), self.monitor)
 
             return output
 
