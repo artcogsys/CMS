@@ -49,6 +49,14 @@ class Iterator(object):
         :return:
         """
 
+        raise NotImplementedError
+
+    def render(self, agent):
+        """TO DO: Rendering function to track input-output over time
+
+        :param agent:
+        :return:
+        """
         pass
 
 #####
@@ -121,9 +129,9 @@ class World(object):
                 if snapshot > 0 and idx % snapshot == 0:
                     self.save_snapshot(idx)
 
-                # if monitor is defined then run optional monitoring function
+                # if monitor is defined then execute optional monitoring function
                 if monitor > 0 and idx % monitor == 0:
-                    map(lambda x: x.model.monitor.run() if x.model.monitor else None, self.agents)
+                    map(lambda x: x.monitor.run() if x.monitor else None, self.agents)
 
                 cum_loss += losses
 
@@ -137,7 +145,7 @@ class World(object):
 
             # if monitor is defined then run optional monitoring function
             if monitor == -1:
-                map(lambda x: x.model.monitor.run() if x.model.monitor else None, self.agents)
+                map(lambda x: x.monitor.run() if x.model.monitor else None, self.agents)
 
         if plot and gfx[0]:
             gfx[0].savefig(os.path.join(self.out, 'loss'))
@@ -199,7 +207,7 @@ class World(object):
 
                 # if monitor is defined then run optional monitoring function
                 if monitor > 0 and idx % monitor == 0:
-                    map(lambda x: x.model.monitor.run() if x.model.monitor else None, self.agents)
+                    map(lambda x: x.monitor.run() if x.model.monitor else None, self.agents)
 
                 cum_loss += losses
 
@@ -229,7 +237,7 @@ class World(object):
 
             # if monitor is defined then run optional monitoring function
             if monitor == -1:
-                map(lambda x: x.model.monitor.run() if x.model.monitor else None, self.agents)
+                map(lambda x: x.monitor.run() if x.model.monitor else None, self.agents)
 
             # store best models in case we are validating
             for i in range(self.n_agents):

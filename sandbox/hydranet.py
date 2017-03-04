@@ -4,9 +4,9 @@ from world.data import *
 from agent.supervised import StatefulAgent
 from brain.models import Regressor
 from chainer.datasets import *
-from world.base import World
 from brain.monitor import Monitor
 from brain.networks import *
+from world.base import *
 
 #####
 ## Hydranet RNN
@@ -86,8 +86,8 @@ class MyMonitor(Monitor):
 
     def run(self):
 
-        input = self.get('input')[-1]
-        output = self.get('prediction')[-1]
+        input = self['input'][-1]
+        output = self['prediction'][-1]
 
         if not hasattr(self, 'fig'):
 
@@ -128,7 +128,7 @@ agent = StatefulAgent(model, chainer.optimizers.Adam(), cutoff=50)
 agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
 
 # add monitor to model and define function to apply
-agent.model.add_monitor(MyMonitor(names=['input', 'prediction'], append=False))
+agent.add_monitor(MyMonitor(names=['input', 'prediction'], len=1))
 
 # define world
 world = World(agent)

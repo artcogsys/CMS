@@ -46,6 +46,9 @@ class RandomIterator(Iterator):
 
         return list(self.data[self._order[i:(i + self.batch_size)]])
 
+    def process(self, agent):
+        pass
+
 #####
 ## Sequential iterator - returns sequential samples of a chainer TupleDataset
 
@@ -87,6 +90,9 @@ class SequentialIterator(Iterator):
         self.idx += 1
 
         return list(self.data[self._order[i:(i + self.batch_size)]])
+
+    def process(self, agent):
+        pass
 
 
 #####

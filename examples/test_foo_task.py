@@ -1,7 +1,7 @@
 # Foo task tested with a random RL agent
 
 from agent.reinforcement import *
-from brain.monitor import Monitor
+from brain.monitor import *
 from brain.models import ActorCriticModel
 from brain.networks import *
 from world.base import World
@@ -23,8 +23,12 @@ model = ActorCriticModel(MLP(data_iter.n_input, n_output, n_hidden=10))
 # define agent
 agent = REINFORCEAgent(model, chainer.optimizers.Adam())
 
+# add oscilloscope
+agent.add_monitor(Oscilloscope(names=['return']))
+
 # define world
 world = World(agent)
 
-# run world in test mode
-world.test(data_iter, n_epochs=n_epochs, plot=-1)
+# run world in training mode
+world.train(data_iter, n_epochs=n_epochs, plot=-1, monitor=-1)
+

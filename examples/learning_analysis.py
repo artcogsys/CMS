@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 # parameters
-n_epochs = 10
+n_epochs = 1
 
 # define training environment
 train_iter = RandomIterator(RegressionData(), batch_size=32)
@@ -42,8 +42,8 @@ test_iter = RandomIterator(RegressionData(), batch_size=32)
 def foo(monitor):
 
     # extract variables
-    Y = monitor.get('prediction')
-    T = monitor.get('target')
+    Y = monitor['prediction']
+    T = monitor['target']
     [n_samples, n_vars] = Y.shape
 
     colors = cm.rainbow(np.linspace(0, 1, n_vars))

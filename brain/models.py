@@ -165,6 +165,8 @@ class ActorCriticModel(Model):
         # linear outputs reflecting the log action probabilities and the value
         out = self.predictor(x, train)
 
+        batch_size = out.shape[0]
+
         policy = out[:,:-1]
 
         value = out[:,-1]
@@ -174,15 +176,15 @@ class ActorCriticModel(Model):
             value = F.expand_dims(value, axis=1)
 
         # generate action according to policy
-        p = F.softmax(policy).data[0]
+        p = F.softmax(policy).data
 
         # normalize p in case tiny floating precision problems occur
-        p = p.astype('float32')
-        p /= p.sum()
+        row_sums = p.sum(axis=1)
+        p /= row_sums[:, np.newaxis]
 
         # discrete representation
         n_out = self.predictor.n_output-1
-        action = np.random.choice(n_out, None, True, p)
+        action = np.array([np.random.choice(n_out, None, True, p[i]) for i in range(p.shape[0])], dtype='int32').reshape([batch_size, 1])
 
         return action, policy, value
 

@@ -16,7 +16,7 @@ class ActorCriticAgent(Agent):
 
         logp = F.log_softmax(pi)
 
-        score = F.select_item(logp, Variable(np.asarray([action], dtype=np.int32)))
+        score = F.select_item(logp, Variable(action.squeeze()))
 
         # handle case where we have only one element per batch
         if score.ndim == 1:
@@ -26,8 +26,13 @@ class ActorCriticAgent(Agent):
 
 class REINFORCEAgent(ActorCriticAgent):
     """
-    Note that REINFORCE is a policy gradient method which does not use a critic. Instead the value is computed as a
-    running estimate
+    Note that REINFORCE is a policy gradient method which does not use a critic.
+    Instead the return is computed as a running estimate
+
+    https://webdocs.cs.ualberta.ca/%7Esutton/book/bookdraft2016sep.pdf
+    https://github.com/dennybritz/reinforcement-learning/tree/master/PolicyGradient
+    http://blog.shakirm.com/2015/11/machine-learning-trick-of-the-day-5-log-derivative-trick/
+    http://www.1-4-5.net/~dmm/ml/log_derivative_trick.pdf
     """
 
     def __init__(self, model, optimizer=None, gpu=-1, cutoff=None, gamma=0.99):
@@ -40,28 +45,31 @@ class REINFORCEAgent(ActorCriticAgent):
         # discounting factor
         self.gamma = gamma
 
-        # keep track of loss for BPTT
-        self.loss = Variable(self.xp.zeros((), 'float32'))
-
-        # keep track of value for BPTT
-        self.value = Variable(self.xp.zeros((), 'float32'))
+        # reset state
+        self.reset()
 
     def run(self, data, train=True, idx=None, final=False):
 
-        # reward associated with taking the previous action
+        # get reward associated with taking the previous action in the previous state
         reward = data[-1]
 
-        # update value
-        self.value += self.gamma * reward
+        # determine if we already completed a perception-action cycle
+        if not self.score is None:
 
-        # provide observation to RL model. Returns action, policy and value
-        action, policy, _ = self.model(map(lambda x: Variable(self.xp.asarray(x)), data), train=train)
+            # update return using reward
+            if self._return is None:
+                self._return = self.gamma * Variable(reward)
+            else:
+                self._return += self.gamma * Variable(reward)
 
-        self.action = action
+            # add minus the score function times the value based on (s_t-1, a_t-1, r_t-1) to loss
+            self.loss -= F.squeeze(F.sum(F.batch_matmul(self.score, self._return, transa=True), axis=0))
 
-        score = self.score_function(action, policy)
+        # compute policy and take new action based on observations
+        self.action, policy, _ = self.model(map(lambda x: Variable(self.xp.asarray(x)), data), train=train)
 
-        self.loss += score * self.value
+        # recompute score function: grad_theta log pi_theta (s_t, a_t) * v_t
+        self.score = self.score_function(self.action, policy)
 
         # backpropagate if we reach the cutoff for truncated backprop or if we processed the last batch
         if train and ((self.cutoff and (idx % self.cutoff) == 0) or final):
@@ -73,9 +81,36 @@ class REINFORCEAgent(ActorCriticAgent):
 
             self.loss = Variable(self.xp.zeros((), 'float32'))
 
-            self.value = Variable(self.xp.zeros((), 'float32'))
+            # store return
+            if self.monitor:
+                self.monitor.set('return', np.mean(self._return.data))
 
-        return float(score.data[0])
+            self._return = None
+
+        # reset if we reached the end of an episode
+        if final:
+
+            self.action = None
+            self.score = None
+            self._return = None
+
+        return self.loss.data
+
+    def reset(self):
+
+        self.model.predictor.reset_state()
+
+        # keep track of loss for BPTT
+        self.loss = Variable(self.xp.zeros((), 'float32'))
+
+        # keep track of action by agent
+        self.action = None
+
+        ## keep track of history
+
+        self.score = None
+        self._return = None
+
 
 
 

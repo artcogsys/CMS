@@ -215,6 +215,8 @@ class RNNForLM(Chain, Network):
         for param in self.params():
             param.data[...] = np.random.uniform(-0.1, 0.1, param.data.shape)
 
+        self.monitor = None
+
     def __call__(self, x, train=False):
 
         h0 = self.embed(x)

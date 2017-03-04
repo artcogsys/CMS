@@ -127,7 +127,6 @@ or do it post hoc on snapshots of the model (see learning analysis example)
 
 ## TO DO
 
-* Add example of a task (data will be dependent on network action)
 * Add multiple reinforcement learning algorithms
 * Add streaming data handling video/audio/linguistic
 * Add Universe integration
@@ -137,7 +136,6 @@ or do it post hoc on snapshots of the model (see learning analysis example)
 * Abstract as much as possible to enable use of other libraries
 * Add support for multiple agents in life-long learning setting
 * Generate full documentation on the fly using Sphinx/Read the Docs
-* Add support for multiple optimizers in Trainer and multiple models in Tester
 * Move basic datasets to version testing; keep core codebase as clean
 as possible, e.g. by moving part of this code to specific test cases
 * Create agents that have train and test modes; but how to best support multiagent.
@@ -156,8 +154,8 @@ Agents running on environments
 * First implement random RL agent to make it all fit
 * Test if we can run multiple RL agents in comparison mode
 * Todo: actor-critic model aanvullen; implement run function van actor-critic agent
-* Make agent work with multiple batches - batch_size not yet implemented; see Foo
 * Implement REINFORCE agent
 * RL agent normalize score function by nr of datapoints as return
 * Handle initial observations/rewards
 * make REINFORCE standalone agent
+* fix learning_analysis movie generation
