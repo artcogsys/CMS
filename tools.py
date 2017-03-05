@@ -5,46 +5,6 @@ import matplotlib.pyplot as plt
 from world.base import *
 from brain.monitor import *
 
-def plot_loss(gfx, idx, losses, labels=None):
-    """ Plot losses
-
-    :param gfx: list of [figure handle, axis handle, hl: data handle]
-    :param idx: index at which to plot loss
-    :param losses: list of loss values
-    :param labels: optional list of loss labels
-    :return: fig, ax, hl
-    """
-
-    if gfx is None:
-
-        fig, ax = plt.subplots()
-        ax.set_xlabel('t')
-        ax.set_ylabel('loss')
-        hl = np.empty(len(losses), dtype=object)
-        for i in range(len(losses)):
-            hl[i], = ax.plot(idx, losses[i])
-        if not labels is None:
-           fig.legend(hl, tuple(labels))
-        fig.show()
-
-    else:
-
-        fig = gfx[0]
-        ax = gfx[1]
-        hl = gfx[2]
-
-        x_data = np.vstack([hl[0].get_xdata(), idx])
-        for i in range(len(losses)):
-            hl[i].set_xdata(x_data)
-            y_data = np.vstack([hl[i].get_ydata(), losses[i]])
-            hl[i].set_ydata(y_data)
-        ax.relim()
-        ax.autoscale_view()
-        fig.canvas.draw()
-        fig.canvas.flush_events()
-
-    return [fig, ax, hl]
-
 def movie(snapshots, data_iter, agent, function, name, dpi=100, fps=1):
 
     # get video writer

@@ -9,7 +9,7 @@ from world.data import *
 from world.tasks import Foo
 
 # parameters
-n_epochs = 100
+n_epochs = 200
 
 # define iterator
 data_iter = Foo(batch_size=32, n_batches = 100)

@@ -57,9 +57,9 @@ predictions.
 
 A monitor is used to monitor the internal states of either a model or a
 predictor. It is also used to monitor the past states of an RL agent
-to allow RL updating.
+to allow RL updating. It can store from 1 up to inf number of observations
 
-A monitor can be added to an agent, model or predictor. If added to an
+One or more monitors can be added to an agent, model or predictor. If added to an
 agent then it will add automatically to model and predictor. We allow
 multiple monitors that each fulfills a specific function
 
@@ -153,21 +153,11 @@ Agents running on environments
   Create generic monitor function; allow multiple monitors that also take
   care of snapshots, loss, throughput; define standard monitors; this
   makes comparison harder; since then each agent gets its own figure window
-* Create oscilloscope type monitors
-* Reconsider if we want the loss monitoring to implemented by a monitor
-* Reconsider if we wish to add multiple monitors to models/predictors
 * Think about best integration between CMS and DRM
-* Data and task iterators should derive from same type; act option always present
-* Generalize monitor such that it takes at most n states (see buffer implementation)
-* First implement random RL agent to make it all fit
 * Test if we can run multiple RL agents in comparison mode
-* Todo: actor-critic model aanvullen; implement run function van actor-critic agent
-* Implement REINFORCE agent
-* RL agent normalize score function by nr of datapoints as return
-* Handle initial observations/rewards
-* make REINFORCE standalone agent
 * fix learning_analysis movie generation
-* make loss plot dependent on oscilloscope;
-  add multiple monitors; oscilloscope plots multiple things in same window
 * Allow multiple inheritance for networks so we dont need to set monitor each time
 * finish base class loss plot; run test_foo; cleanup base wrt validation part
+* why does loss increase for RLagent? Make REINFORCE non actor-critic
+* Implement ProbabilisticCategorizationTask
+* Implement AAL

@@ -67,11 +67,13 @@ class Oscilloscope(Monitor):
     Defines an oscilloscope for one or more signals of interest defined in names
     """
 
-    def __init__(self, names=None, len=np.inf):
+    def __init__(self, names=None, len=np.inf, ylabel=None):
 
         super(Oscilloscope, self).__init__(names, len)
 
         self.fig = self.ax = self.hl = None
+
+        self.ylabel = ylabel
 
     def run(self):
 
@@ -83,7 +85,8 @@ class Oscilloscope(Monitor):
 
             self.fig, self.ax = plt.subplots()
             self.ax.set_xlabel('t')
-            #self.ax.set_ylabel('loss')
+            if self.ylabel:
+                self.ax.set_ylabel(self.ylabel)
             self.hl = np.empty(len(keys), dtype=object)
             for i in range(len(keys)):
                 key = self.keys()[i]
