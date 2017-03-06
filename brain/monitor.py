@@ -91,7 +91,7 @@ class Oscilloscope(Monitor):
             for i in range(len(keys)):
                 key = self.keys()[i]
                 self.hl[i], = self.ax.plot(np.arange(self[key].size), self[key])
-            self.fig.legend(self.hl, tuple(self.names))
+            self.fig.legend(self.hl, tuple(keys))
             self.fig.show()
 
         else:

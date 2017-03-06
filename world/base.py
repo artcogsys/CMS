@@ -82,7 +82,7 @@ class World(object):
         self.n_agents = len(self.agents)
 
         # optional labels for plotting
-        # Note that validate first plots the training losses and then the validation losses
+        # Note that validate follows the order ['training-0', 'validation-0', 'training-1', 'validation-1']
         self.labels = None
 
     def save_snapshot(self, idx):
@@ -112,10 +112,8 @@ class World(object):
         """
 
         if plot:
-            if not validation is None:
-                loss_monitor = Oscilloscope(['training', 'validation'], ylabel='loss')
-            else:
-                loss_monitor = Oscilloscope(['training'], ylabel='loss')
+            loss_monitor = Oscilloscope(ylabel='loss')
+            labels = self.get_labels(train, validation)
 
         # initialization for validation
         min_loss = [None] * self.n_agents
@@ -142,7 +140,8 @@ class World(object):
                 idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
 
                 if plot > 0 and idx % plot == 0:
-                    loss_monitor.set('training', losses)
+                    for i in range(len(self.agents)):
+                        loss_monitor.set(labels[i], losses)
                     loss_monitor.run()
 
                 if snapshot > 0 and idx % snapshot == 0:
@@ -182,9 +181,13 @@ class World(object):
 
             # plot cumulative loss averaged over number of batches of each agent
             if plot == -1:
-                loss_monitor.set('training', cum_loss / data_iter.n_batches)
-                if not validation is None:
-                    loss_monitor.set('validation', val_loss / validation.n_batches)
+                idx = 0
+                for i in range(len(self.agents)):
+                    loss_monitor.set(labels[idx], cum_loss[i] / data_iter.n_batches)
+                    idx += 1
+                    if not validation is None:
+                        loss_monitor.set(labels[idx], val_loss[i] / validation.n_batches)
+                    idx += 1
                 loss_monitor.run()
 
             # store snapshot
@@ -203,3 +206,27 @@ class World(object):
 
         if plot:
             loss_monitor.save(os.path.join(self.out, 'loss'))
+
+    def get_labels(self, train, validation):
+
+        if not self.labels is None:
+            labels = self.labels
+        else:
+            if len(self.agents)==1:
+                if train:
+                    labels = ['training']
+                else:
+                    labels = ['testing']
+                if not validation is None:
+                    labels += ['validation']
+            else:
+                labels = []
+                for i in range(len(self.agents)):
+                    if train:
+                        labels += ['training-' + str(i)]
+                    else:
+                        labels += ['testing-' + str(i)]
+                    if not validation is None:
+                        labels += ['validation-' + str(i)]
+
+        return labels

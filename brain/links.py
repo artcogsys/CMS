@@ -4,6 +4,7 @@ from chainer.functions.activation import relu
 from chainer import link
 from chainer.links.connection import linear
 import chainer.functions as F
+from chainer import initializers
 
 ###
 # Implementation of custom links and layers

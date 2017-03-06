@@ -157,7 +157,7 @@ agent2 = StatelessAgent(model2, chainer.optimizers.Adam())
 world = World([agent1, agent2])
 
 # add labels to plot - validate first generates training losses and then test losses
-world.labels = ['Context train', 'MLP train', 'Context test', 'MLP test']
+world.labels = ['Context train', 'Context test', 'MLP train', 'MLP test']
 
 # run world in training mode with validation
 world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=-1)
