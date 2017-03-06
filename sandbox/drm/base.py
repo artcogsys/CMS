@@ -108,6 +108,9 @@ class DRMIterator(Iterator):
 
         return [stim_data, resp_data]
 
+    def process(self, agent):
+        pass
+
 #####
 ## DRM
 
