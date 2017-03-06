@@ -6,13 +6,14 @@ from brain.models import ActorCriticModel
 from brain.networks import *
 from world.base import World
 from world.data import *
-from world.tasks import Foo
+from world.tasks import *
 
 # parameters
 n_epochs = 200
 
 # define iterator
 data_iter = Foo(batch_size=32, n_batches = 100)
+#data_iter = ProbabilisticCategorizationTask(batch_size=32, n_batches = 100)
 
 # an actor-critic model assumes that the predictor's output is number of actions plus one for the value
 n_output = data_iter.n_output + 1

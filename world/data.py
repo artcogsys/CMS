@@ -30,19 +30,19 @@ class RandomIterator(Iterator):
 
     def __iter__(self):
 
-        self.idx = 0
+        self.idx = -1
         self._order = np.random.permutation(len(self.data))[:(self.n_batches * self.batch_size)]
 
         return self
 
     def next(self):
 
-        if self.idx == self.n_batches:
+        if self.idx == self.n_batches-1:
             raise StopIteration
 
-        i = self.idx * self.batch_size
-
         self.idx += 1
+
+        i = self.idx * self.batch_size
 
         return list(self.data[self._order[i:(i + self.batch_size)]])
 
@@ -68,7 +68,7 @@ class SequentialIterator(Iterator):
 
     def __iter__(self):
 
-        self.idx = 0
+        self.idx = -1
 
         offsets = [i * self.n_batches for i in range(self.batch_size)]
 
@@ -82,12 +82,12 @@ class SequentialIterator(Iterator):
 
     def next(self):
 
-        if self.idx == self.n_batches:
+        if self.idx == self.n_batches-1:
             raise StopIteration
 
-        i = self.idx * self.batch_size
-
         self.idx += 1
+
+        i = self.idx * self.batch_size
 
         return list(self.data[self._order[i:(i + self.batch_size)]])
 

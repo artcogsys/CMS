@@ -24,6 +24,18 @@ class ActorCriticAgent(Agent):
 
         return score
 
+    def entropy(self, pi):
+
+        p = F.softmax(pi)
+        logp = F.log_softmax(pi)
+
+        return - F.sum(p * logp, axis=1)
+
+
+#####
+## REINFORCE algorithm
+#
+
 class REINFORCEAgent(ActorCriticAgent):
     """
     Note that REINFORCE is a policy gradient method which does not use a critic.
@@ -35,7 +47,7 @@ class REINFORCEAgent(ActorCriticAgent):
     http://www.1-4-5.net/~dmm/ml/log_derivative_trick.pdf
     """
 
-    def __init__(self, model, optimizer=None, gpu=-1, cutoff=None, gamma=0.99):
+    def __init__(self, model, optimizer=None, gpu=-1, cutoff=None, gamma=0.99, beta=1e-2):
 
         super(REINFORCEAgent, self).__init__(model, optimizer=optimizer, gpu=gpu)
 
@@ -44,6 +56,9 @@ class REINFORCEAgent(ActorCriticAgent):
 
         # discounting factor
         self.gamma = gamma
+
+        # contribution of entropy term
+        self.beta = beta
 
         # reset state
         self.reset()
@@ -54,7 +69,7 @@ class REINFORCEAgent(ActorCriticAgent):
         reward = data[-1]
 
         # determine if we already completed a perception-action cycle
-        if not self.score is None:
+        if not self._score is None:
 
             # update return using reward
             if self._return is None:
@@ -63,7 +78,10 @@ class REINFORCEAgent(ActorCriticAgent):
                 self._return += self.gamma * Variable(reward)
 
             # add minus the score function times the value based on (s_t-1, a_t-1, r_t-1) to loss
-            loss = - F.squeeze(F.sum(F.batch_matmul(self.score, self._return, transa=True), axis=0))
+            loss = - F.squeeze(F.sum(F.batch_matmul(self._score, self._return, transa=True), axis=0))
+
+            # add entropy term
+            loss -= self.beta * self._entropy
 
             self.loss += loss
 
@@ -77,7 +95,10 @@ class REINFORCEAgent(ActorCriticAgent):
         self.action, policy, _ = self.model(map(lambda x: Variable(self.xp.asarray(x)), data), train=train)
 
         # recompute score function: grad_theta log pi_theta (s_t, a_t) * v_t
-        self.score = self.score_function(self.action, policy)
+        self._score = self.score_function(self.action, policy)
+
+        # compute entropy
+        self._entropy = F.sum(self.entropy(policy))
 
         # backpropagate if we reach the cutoff for truncated backprop or if we processed the last batch
         if train and ((self.cutoff and (idx % self.cutoff) == 0) or final):
@@ -107,5 +128,11 @@ class REINFORCEAgent(ActorCriticAgent):
 
         ## keep track of history
 
-        self.score = None
+        self._score = None
+        self._entropy = None
         self._return = None
+
+
+#####
+## Advantage Actor-Critic algorithm
+#

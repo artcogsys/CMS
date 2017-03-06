@@ -15,12 +15,9 @@ class Iterator(object):
         self.batch_size = batch_size
         self.n_batches = n_batches
 
-        # index of current batch
-        self.idx=0
-
     def __iter__(self):
 
-        self.idx = 0
+        self.idx = -1
 
         return self
 
@@ -37,7 +34,7 @@ class Iterator(object):
 
         :return: boolean if final batch is reached
         """
-        return (self.idx==self.n_batches)
+        return (self.idx==self.n_batches-1)
 
     def process(self, agent):
         """
@@ -142,8 +139,7 @@ class World(object):
                 # used in case of processing of tasks by RL agents
                 map(lambda x: data_iter.process(x), self.agents)
 
-                idx = data_iter.idx if np.isinf(
-                    data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
+                idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
 
                 if plot > 0 and idx % plot == 0:
                     loss_monitor.set('training', losses)

@@ -31,18 +31,50 @@ class Foo(Iterator):
 
     def __iter__(self):
 
-        self.idx = 0
-        self.state = np.random.choice(2, [self.batch_size, 1], True, [0.5, 0.5]).astype('int32')
-        self.reward = 0
+        self.idx = -1
+        self.state = self.get_state()
+        self.obs = self.get_observation()
+        self.reward = np.zeros([self.batch_size, 1]).astype('float32')
 
         return self
 
     def next(self):
 
-        if self.idx == self.n_batches:
+        if self.idx == self.n_batches-1:
             raise StopIteration
 
         self.idx += 1
+
+        # return new observation and reward associated with agent's choice
+        return self.obs, self.reward
+
+    def process(self, agent):
+        """ Process agent action, compute reward and generate new state and observation
+
+        :param agent:
+        :return:
+        """
+
+        self.reward = (2 * (agent.action == self.state) - 1).astype('float32')
+
+        # this task always produces a new observation after each decision
+        self.state = self.get_state()
+
+        self.obs = self.get_observation()
+
+    def get_state(self):
+        """
+
+        :return: new state
+        """
+
+        return np.random.choice(2, [self.batch_size, 1], True, [0.5, 0.5]).astype('int32')
+
+    def get_observation(self):
+        """
+
+        :return: observation given the state
+        """
 
         # produce a new observation at each step
         obs = np.zeros([self.batch_size, self.n_input]).astype('float32')
@@ -53,20 +85,7 @@ class Foo(Iterator):
             else:
                 obs[i] = np.random.choice(2, [1, self.n_input], True, np.array([1 - self.p, self.p]))
 
-        # return new observation and reward associated with agent's choice
-        return obs, self.reward
-
-    def process(self, agent):
-
-        if self.is_final():
-            self.reward = 0
-        else:
-            # reward is +1 or -1
-            self.reward = (2 * (agent.action == self.state) - 1).astype('float32')
-
-        # this task always produces a new observation after each decision
-        self.state = np.random.choice(2, [self.batch_size, 1], True, [0.5, 0.5]).astype('int32')
-
+        return obs
 ###
 # Probabilistic categorization task
 
@@ -104,7 +123,7 @@ class ProbabilisticCategorizationTask(Iterator):
 
         """
 
-        super(Foo, self).__init__(batch_size=batch_size, n_batches=n_batches)
+        super(ProbabilisticCategorizationTask, self).__init__(batch_size=batch_size, n_batches=n_batches)
 
         self.odds = np.array(odds)
 
@@ -114,61 +133,60 @@ class ProbabilisticCategorizationTask(Iterator):
         self.p = self.odds/float(np.sum(self.odds))
         self.q = (1.0/self.odds)/float(np.sum(1.0/self.odds))
 
-        self.ninput = len(self.p)
-        self.noutput = 3 # number of output variables
+        self.n_input = len(self.p)
+        self.n_output = 3 # number of output variables
 
         self.rewards = [-1, 15, -100]
 
         # normalize rewards
         self.rewards = np.array(self.rewards, dtype='float32') / np.max(np.abs(self.rewards)).astype('float32')
 
+        self.state = None
+        self.obs = None
+        self.reward = np.zeros([self.batch_size, 1]).astype('float32')
 
     def __iter__(self):
 
-        self.idx = 0
-        self.state = np.int32(np.random.randint(1, 3))  # 1 = left, 2 = right
-        self.reward = 0
+        self.idx = -1
+        self.state = np.int32(np.random.randint(1, 3, size=[self.batch_size,1]))
+        self.obs = np.zeros([self.batch_size, self.n_input], dtype='float32')
+        self.reward = np.zeros([self.batch_size, 1]).astype('float32')
 
         return self
 
     def next(self):
 
-        if self.idx == self.n_batches:
+        if self.idx == self.n_batches-1:
             raise StopIteration
 
         self.idx += 1
 
-        # produce a new observation at each step
-        obs = np.zeros([self.batch_size, self.n_input]).astype('float32')
-
-        for i in range(self.batch_size):
-
-            if self.state[i] == 0:
-                obs[i] = np.random.choice(2, [1, self.n_input], True, np.array([self.p, 1 - self.p]))
-            else:
-                obs[i] = np.random.choice(2, [1, self.n_input], True, np.array([1 - self.p, self.p]))
-
         # return new observation and reward associated with agent's choice
-        return obs, self.reward
+        return self.obs, self.reward
 
     def process(self, agent):
 
-        # convert 1-hot encoding to discrete action
-        action = np.argmax(agent.action)
+        obs = np.zeros([self.batch_size, self.n_input], dtype='float32')
 
-        if action == 0:  # wait to get new evidence
-
-            self.reward = self.rewards[0]
-
-            self.terminal = np.float32(0)
-
-        else:  # left or right was chosen
-
-            if action == self.state:
-                self.reward = self.rewards[1]
+        # handle cases where new piece of evidence is requested
+        idx = np.where(agent.action == 0)[0]
+        self.reward[idx] = self.rewards[0]
+        for i in idx:
+            if self.state[i]==1:
+                evidence = np.random.choice(self.n_input, p=self.p)
             else:
-                self.reward = self.rewards[2]
+                evidence = np.random.choice(self.n_input, p=self.q)
+            obs[i,evidence] = 1
 
-            self.terminal = np.float32(1)
+        # handle cases where left or right was chosen
+        idx = np.where(agent.action != 0)[0]
+        for i in idx:
 
-            obs, target = self.reset()
+            if agent.action[i] == self.state[i]:
+                self.reward[i] = self.rewards[1]
+            else:
+                self.reward[i] = self.rewards[2]
+
+            self.state[i] = np.int32(np.random.randint(1, 3))
+
+        self.obs = obs

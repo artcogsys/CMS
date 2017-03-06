@@ -146,10 +146,8 @@ class ActorCriticModel(Model):
     An actor critic model computes the action, policy and value from a predictor
     """
 
-    def __init__(self, predictor, output_function=lambda x:x):
+    def __init__(self, predictor):
         super(ActorCriticModel, self).__init__(predictor=predictor)
-
-        self.output_function = output_function
 
     def __call__(self, data, train=False):
         """
@@ -165,8 +163,6 @@ class ActorCriticModel(Model):
         # linear outputs reflecting the log action probabilities and the value
         out = self.predictor(x, train)
 
-        batch_size = out.shape[0]
-
         policy = out[:,:-1]
 
         value = out[:,-1]
@@ -174,6 +170,20 @@ class ActorCriticModel(Model):
         # handle case where we have only one element per batch
         if value.ndim == 1:
             value = F.expand_dims(value, axis=1)
+
+        action = self.get_action(policy)
+
+        return action, policy, value
+
+    def predict(self, data, train=False):
+
+        out = self.predictor(data, train)
+
+        policy = out[:, :-1]
+
+        return self.get_action(policy)
+
+    def get_action(self,policy):
 
         # generate action according to policy
         p = F.softmax(policy).data
@@ -184,13 +194,5 @@ class ActorCriticModel(Model):
 
         # discrete representation
         n_out = self.predictor.n_output-1
-        action = np.array([np.random.choice(n_out, None, True, p[i]) for i in range(p.shape[0])], dtype='int32').reshape([batch_size, 1])
-
-        return action, policy, value
-
-    def predict(self, data, train=False):
-
-        pi = self.predictor(data, train)[:,:-1]
-
-        return self.output_function(pi).data
-
+        batch_size = policy.shape[0]
+        return np.array([np.random.choice(n_out, None, True, p[i]) for i in range(p.shape[0])], dtype='int32').reshape([batch_size, 1])
