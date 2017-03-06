@@ -20,6 +20,9 @@ class Monitor(object):
 
         self.len = len
 
+    def reset(self):
+        self.dict = defaultdict(list)
+
     def set(self, name, value):
         """
 

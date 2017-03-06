@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 # parameters
-n_epochs = 1
+n_epochs = 10
 
 # define training environment
 train_iter = RandomIterator(RegressionData(), batch_size=32)
@@ -30,7 +30,7 @@ agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
 world = World(agent)
 
 # run world in training mode with validation - shows how to store snapshots each n iterations (instead of epochs)
-world.train(train_iter, n_epochs=n_epochs, plot=-1, snapshot=10)
+world.train(train_iter, n_epochs=n_epochs, plot=-1, snapshot=-1)
 
 # get snapshots
 snapshots = glob.glob(os.path.join(world.out, 'agent-0000-snapshot*'))
@@ -42,16 +42,15 @@ test_iter = RandomIterator(RegressionData(), batch_size=32)
 def foo(monitor):
 
     # extract variables
-    Y = monitor['prediction']
-    T = monitor['target']
+    Y = monitor[0]['prediction']
+    T = monitor[0]['target']
     [n_samples, n_vars] = Y.shape
 
     colors = cm.rainbow(np.linspace(0, 1, n_vars))
-    regs = []
     for i in range(n_vars):
         l = plt.scatter(T[:, i], Y[:, i], c=colors[i, :])
         plt.hold('on')
     plt.axis('off')
 
 # create movie
-movie(snapshots, test_iter, agent, foo, os.path.join(world.out, 'movie.mp4'), dpi=100, fps=2)
+movie(snapshots, test_iter, agent, foo, os.path.join(world.out, 'movie.mp4'), dpi=100, fps=1)

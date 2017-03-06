@@ -5,7 +5,11 @@ import matplotlib.pyplot as plt
 from world.base import *
 from brain.monitor import *
 
+
 def movie(snapshots, data_iter, agent, function, name, dpi=100, fps=1):
+
+    # set monitor for snapshot
+    monitor = Monitor()
 
     # get video writer
     FFMpegWriter = manimation.writers['ffmpeg']
@@ -24,17 +28,16 @@ def movie(snapshots, data_iter, agent, function, name, dpi=100, fps=1):
             # load snapshot
             agent.model.load(snapshots[i])
 
-            # set monitor for snapshot
-            monitor = Monitor()
-
-            agent.model.add_monitor(monitor)
+            agent.add_monitor(monitor)
 
             world = World(agent)
 
             # run some test data
             world.test(data_iter)
 
-            function(agent.model.monitor)
+            function(agent.monitor)
+
+            monitor.reset()
 
             writer.grab_frame()
 
