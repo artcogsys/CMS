@@ -60,61 +60,72 @@ class REINFORCEAgent(ActorCriticAgent):
         # contribution of entropy term
         self.beta = beta
 
+        # monitor score, entropy and reward
+        self.buffer = Monitor()
+
         # reset state
         self.reset()
 
     def run(self, data, train=True, idx=None, final=False):
+        """
+
+        :param data: a new observation and the reward associated with the previous observation and action
+        :param train:
+        :param idx:
+        :param final:
+        :return:
+        """
 
         # get reward associated with taking the previous action in the previous state
         reward = data[-1]
-
-        # determine if we already completed a perception-action cycle
-        if not self._score is None:
-
-            # update return using reward
-            if self._return is None:
-                self._return = self.gamma * Variable(reward)
-            else:
-                self._return += self.gamma * Variable(reward)
-
-            # add minus the score function times the value based on (s_t-1, a_t-1, r_t-1) to loss
-            loss = - F.squeeze(F.sum(F.batch_matmul(self._score, self._return, transa=True), axis=0))
-
-            # add entropy term
-            loss -= self.beta * self._entropy
-
-            self.loss += loss
-
-            # normalize by number of datapoints in minibatch
-            _loss = float(loss.data / data[0].shape[0])
-
-        else:
-            _loss = 0.0
+        if not reward is None:
+            self.buffer.set('reward', reward)
 
         # compute policy and take new action based on observations
         self.action, policy, _ = self.model(map(lambda x: Variable(self.xp.asarray(x)), data), train=train)
 
         # recompute score function: grad_theta log pi_theta (s_t, a_t) * v_t
-        self._score = self.score_function(self.action, policy)
+        self.buffer.set('score', self.score_function(self.action, policy))
 
         # compute entropy
-        self._entropy = F.sum(self.entropy(policy))
+        self.buffer.set('entropy', F.sum(self.entropy(policy)))
 
         # backpropagate if we reach the cutoff for truncated backprop or if we processed the last batch
         if train and ((self.cutoff and (idx % self.cutoff) == 0) or final):
 
-            self.optimizer.zero_grads()
-            self.loss.backward()
-            self.loss.unchain_backward()
-            self.optimizer.update()
+            # remove last results since we have no reward associated
+            self.buffer.dict['score'].pop()
+            self.buffer.dict['entropy'].pop()
+
+            # return associated with last state
+            _return = 0
+
+            loss = Variable(self.xp.zeros((), 'float32'))
+            for i in range(len(self.buffer.dict['reward'])-1,-1,-1):
+
+                _return = self.buffer.dict['reward'].pop() + self.gamma * _return
+
+                loss -= F.squeeze(F.sum(F.batch_matmul(self.buffer.dict['score'].pop(), _return, transa=True), axis=0))
+
+                loss -= self.beta * self.buffer.dict['entropy'].pop()
+
+                _loss = loss.data
+
+                self.optimizer.zero_grads()
+                loss.backward()
+                loss.unchain_backward()
+                self.optimizer.update()
 
             # store return
             if self.monitor:
-                map(lambda x: x.set('return', np.mean(self._return.data)), self.monitor)
+                map(lambda x: x.set('return', np.mean(_return)), self.monitor)
 
-            self._return = None
+        else:
+
+            _loss = 0
 
         return _loss
+
 
     def reset(self):
 
@@ -131,6 +142,9 @@ class REINFORCEAgent(ActorCriticAgent):
         self._score = None
         self._entropy = None
         self._return = None
+
+        self.buffer = Monitor()
+
 
 
 #####

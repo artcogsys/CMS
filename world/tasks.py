@@ -34,7 +34,7 @@ class Foo(Iterator):
         self.idx = -1
         self.state = self.get_state()
         self.obs = self.get_observation()
-        self.reward = np.zeros([self.batch_size, 1]).astype('float32')
+        self.reward = None
 
         return self
 
@@ -143,14 +143,14 @@ class ProbabilisticCategorizationTask(Iterator):
 
         self.state = None
         self.obs = None
-        self.reward = np.zeros([self.batch_size, 1]).astype('float32')
+        self.reward = None
 
     def __iter__(self):
 
         self.idx = -1
         self.state = np.int32(np.random.randint(1, 3, size=[self.batch_size,1]))
         self.obs = np.zeros([self.batch_size, self.n_input], dtype='float32')
-        self.reward = np.zeros([self.batch_size, 1]).astype('float32')
+        self.reward = None
 
         return self
 
