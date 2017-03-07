@@ -95,12 +95,14 @@ class Elman(link.Chain):
 
     def __call__(self, x):
 
+        # add optional mask to input-hidden weights
         if not self.maskU is None:
             if self.U.has_uninitialized_params:
                 with cuda.get_device(self.U._device_id):
                     self.U._initialize_params(x.size // x.shape[0])
             self.U.W *= self.maskU
 
+        # add optional mask to hidden-hidden weights
         if not self.maskW is None:
             if self.W.has_uninitialized_params:
                 with cuda.get_device(self.W._device_id):
