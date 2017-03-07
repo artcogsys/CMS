@@ -246,7 +246,10 @@ class CIFARData(TupleDataset):
             X = train._datasets[0].astype('float32')
             T = train._datasets[1].astype('int32')
 
-        self._n_input = list(X.shape[1:])
+        if convolutional:
+            self._n_input = list(X.shape[1:])
+        else:
+            self._n_input = np.prod(X.shape[1:])
         self._n_output = (np.max(T) + 1)
 
         if n_samples:

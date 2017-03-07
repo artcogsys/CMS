@@ -1,8 +1,9 @@
 # example of using delayiterator to extend classification of static inputs over time
+# also uses masks to implement feedforward versus feedback drive in Elman network
 
 import matplotlib.pyplot as plt
 import tools as tools
-from agent.supervised import StatelessAgent
+from agent.supervised import *
 from brain.models import *
 from brain.monitor import Monitor
 from brain.networks import *
@@ -14,15 +15,17 @@ from world.data import *
 
 class DelayIterator(SequentialIterator):
 
-    def __init__(self, data, trial_length, batch_size=None, noise=None):
+    def __init__(self, data, n_batches, batch_size=None, noise=0):
 
         batch_size = batch_size or len(data)
-        n_batches = trial_length
 
         super(DelayIterator, self).__init__(data, batch_size=batch_size, n_batches=n_batches)
 
-        # flags type of noise - not yet implemented!
-        self.noise = None
+        # flags noise level
+        self.noise = 0
+
+        # get unique values in dataset
+        self.values = np.unique(self.data)
 
     def __iter__(self):
 
@@ -40,25 +43,38 @@ class DelayIterator(SequentialIterator):
 
         self.idx += 1
 
+        data = self.data[self._order]
+
         return list(self.data[self._order])
 
 
 # parameters
-n_epochs = 50
+n_epochs = 300
 
 # get training and validation data - note that we select a subset of datapoints
-train_data = CIFARData(test=False, convolutional=True, n_samples=100)
-val_data =CIFARData(test=True, convolutional=True, n_samples=100)
+train_data = MNISTData(test=False, convolutional=False, n_samples=100)
+val_data = MNISTData(test=True, convolutional=False, n_samples=100)
 
-# define training and validation environment
-train_iter = DelayIterator(train_data, trial_length=3)
-val_iter = DelayIterator(val_data, trial_length=3)
+# define training and validation environment; each trial consists of five consecutive frames
+train_iter = DelayIterator(train_data, n_batches=5, batch_size=32)
+val_iter = DelayIterator(val_data, n_batches=5, batch_size=32)
+
+ninput = train_iter.data.input()
+nhidden = 10
+noutput = train_iter.data.output()
+
+# define mask for Elman network
+mW = np.ones([nhidden, nhidden], np.float32) # hidden-hidden mask
+#mU = np.ones([nhidden, ninput], np.float32) # input-hidden mask
 
 # define brain of agent
-model = Classifier(ConvNet(train_iter.data.input(), train_iter.data.output(), n_hidden=10))
+model = Classifier(RNN(ninput, noutput, n_hidden=nhidden, link=Elman))
+
+# ugly way of setting the mask due to the generic RNN formulation
+model.predictor[0][0].maskW = np.triu(mW,0)
 
 # define agent
-agent = StatelessAgent(model, chainer.optimizers.Adam())
+agent = StatefulAgent(model, chainer.optimizers.Adam())
 
 # add hook
 agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))

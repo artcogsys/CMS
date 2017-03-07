@@ -106,7 +106,7 @@ df_hid = 10
 predictors = [StandardMLP(n_input, n_input*n_hidden, n_hidden=df_hid), StandardMLP(n_hidden, n_hidden*n_output, n_hidden=df_hid)]
 
 # define agent 1
-model1 = Classifier(DynamicFilterMLP(predictors, train_iter.data.input(), train_iter.data.output(), n_hidden=n_hidden, constantW=True~))
+model1 = Classifier(DynamicFilterMLP(predictors, train_iter.data.input(), train_iter.data.output(), n_hidden=n_hidden, constantW=True))
 agent1 = StatelessAgent(model1, chainer.optimizers.Adam())
 
 # define agent 2

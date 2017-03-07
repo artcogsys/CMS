@@ -43,7 +43,18 @@ class Elman(link.Chain):
     """
 
     def __init__(self, in_size, out_size, initU=None,
-                 initW=None, bias_init=0, actfun=relu.relu):
+                 initW=None, bias_init=0, actfun=relu.relu, maskU=None, maskW=None):
+        """
+
+        :param in_size:
+        :param out_size:
+        :param initU:
+        :param initW:
+        :param bias_init:
+        :param actfun:
+        :param maskU: masking of input-hidden weight matrix
+        :param maskW: masking of hidden-hidden weight matrix
+        """
 
         super(Elman, self).__init__(
             U=linear.Linear(in_size, out_size,
@@ -56,6 +67,9 @@ class Elman(link.Chain):
         self.state_size = out_size
         self.reset_state()
         self.actfun = actfun
+
+        self.maskU = maskU
+        self.maskW = maskW
 
     def to_cpu(self):
         super(Elman, self).to_cpu()
@@ -80,6 +94,19 @@ class Elman(link.Chain):
         self.h = None
 
     def __call__(self, x):
+
+        if not self.maskU is None:
+            if self.U.has_uninitialized_params:
+                with cuda.get_device(self.U._device_id):
+                    self.U._initialize_params(x.size // x.shape[0])
+            self.U.W *= self.maskU
+
+        if not self.maskW is None:
+            if self.W.has_uninitialized_params:
+                with cuda.get_device(self.W._device_id):
+                    self.W._initialize_params(self.h.size // self.h.shape[0])
+            self.W.W *= self.maskW
+
 
         z = self.U(x)
         if self.h is not None:

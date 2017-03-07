@@ -161,5 +161,6 @@ Agents running on environments
 * why does loss increase for RLagent? Make REINFORCE non actor-critic
 * Implement ProbabilisticCategorizationTask
 * Implement AAL
-* make REINFORCE work with batch size of 1
-* add terminal state?
+* Make REINFORCE work with batch size of 1
+* Add terminal state?
+* Use chainer's Reporter object to replace Monitor?
