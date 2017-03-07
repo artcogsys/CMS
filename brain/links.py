@@ -133,14 +133,16 @@ class DynamicFilterLinear(chainer.Link):
             self.add_param('b', out_size, initializer=bias_initializer)
 
         if constantW:
+
             self._W_initializer = initializers._get_initializer(
                 initialW, math.sqrt(wscale))
-        self.constantW = constantW
 
-        if in_size is None:
-            self.add_uninitialized_param('C')
-        else:
-            self._initialize_params(in_size)
+            if in_size is None:
+                self.add_uninitialized_param('C')
+            else:
+                self._initialize_params(in_size)
+
+        self.constantW = constantW
 
     def _initialize_params(self, in_size):
         self.add_param('C', (self.out_size, in_size),

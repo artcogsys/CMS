@@ -47,19 +47,20 @@ class DynamicFilterMLP(Chain, Network):
     Basic convolutional neural network
     """
 
-    def __init__(self, predictors, n_input, n_output, n_hidden=10):
+    def __init__(self, predictors, n_input, n_output, n_hidden=10, constantW=True):
         """
 
         :param predictors: list of predictors for each of the weight matrices
         :param n_input: nchannels x height x width
         :param n_output: number of action outputs
         :param n_hidden: number of hidden units
+        :param constantW: add constant W
 
         """
 
         super(DynamicFilterMLP, self).__init__(
-            l1=DynamicFilterLinear(predictors[0], n_input, n_hidden),
-            l2=DynamicFilterLinear(predictors[1], n_hidden, n_output)
+            l1=DynamicFilterLinear(predictors[0], n_input, n_hidden, constantW=constantW),
+            l2=DynamicFilterLinear(predictors[1], n_hidden, n_output, constantW=constantW)
         )
 
         self.ninput = n_input
@@ -86,20 +87,26 @@ n_epochs = 200
 # number of hidden units used in basic MLP
 n_hidden = 10
 
+# get training and validation data - note that we select a subset of datapoints
+# train_data = ClassificationData()
+# val_data = ClassificationData()
+train_data = MNISTData(test=False, convolutional=False, n_samples=100)
+val_data = MNISTData(test=True, convolutional=False, n_samples=100)
+
 # define training and validation environment
-train_iter = RandomIterator(ClassificationData(), batch_size=32)
-val_iter = RandomIterator(ClassificationData(), batch_size=32)
+train_iter = RandomIterator(train_data, batch_size=32)
+val_iter = RandomIterator(val_data, batch_size=32)
 
 n_input = train_iter.data.input()
 n_output = train_iter.data.output()
 
 # specify predictors that implement the dynamic filtering
-df_hid = 5
+df_hid = 10
 
 predictors = [StandardMLP(n_input, n_input*n_hidden, n_hidden=df_hid), StandardMLP(n_hidden, n_hidden*n_output, n_hidden=df_hid)]
 
 # define agent 1
-model1 = Classifier(DynamicFilterMLP(predictors, train_iter.data.input(), train_iter.data.output(), n_hidden=n_hidden))
+model1 = Classifier(DynamicFilterMLP(predictors, train_iter.data.input(), train_iter.data.output(), n_hidden=n_hidden, constantW=True~))
 agent1 = StatelessAgent(model1, chainer.optimizers.Adam())
 
 # define agent 2
