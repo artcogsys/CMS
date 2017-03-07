@@ -5,6 +5,8 @@ from chainer import link
 from chainer.links.connection import linear
 import chainer.functions as F
 from chainer import initializers
+import math
+from chainer import cuda
 
 ###
 # Implementation of custom links and layers
@@ -93,16 +95,19 @@ class Elman(link.Chain):
 
 
 #####
-## Dynamic filter implementation of a linear link
+## Dynamic filter implementation of a linear link; can be generalized to all other links (convolutional, LSTM, Elman, ...)
 
 class DynamicFilterLinear(chainer.Link):
 
-    def __init__(self, predictor, in_size, out_size, bias=0, nobias=False, initial_bias=None):
+    def __init__(self, predictor, in_size, out_size, constantW=True, wscale=1, initialW=None, bias=0, nobias=False, initial_bias=None):
         """
 
         :param predictor: a neural network which implements the dynamic filter that maps from context inputs to a weight matrix
         :param in_size: size of input
         :param out_size: size of output
+        :param constantW: add constant W such that W = C + DF(x)
+        :param wscale: scaling factor
+        :param initialW: used for weight initialization
         :param bias:
         :param nobias:
         :param initial_bias:
@@ -115,6 +120,9 @@ class DynamicFilterLinear(chainer.Link):
         self.predictor = predictor
         self.shape = [out_size, in_size]
 
+        self.in_size = in_size
+        self.out_size = out_size
+
         # add bias term
         if nobias:
             self.b = None
@@ -123,6 +131,20 @@ class DynamicFilterLinear(chainer.Link):
                 initial_bias = bias
             bias_initializer = initializers._get_initializer(initial_bias)
             self.add_param('b', out_size, initializer=bias_initializer)
+
+        if constantW:
+            self._W_initializer = initializers._get_initializer(
+                initialW, math.sqrt(wscale))
+        self.constantW = constantW
+
+        if in_size is None:
+            self.add_uninitialized_param('C')
+        else:
+            self._initialize_params(in_size)
+
+    def _initialize_params(self, in_size):
+        self.add_param('C', (self.out_size, in_size),
+                       initializer=self._W_initializer)
 
     def __call__(self, x, z):
         """
@@ -136,13 +158,21 @@ class DynamicFilterLinear(chainer.Link):
 
         """
 
+        if self.has_uninitialized_params:
+            with cuda.get_device(self._device_id):
+                self._initialize_params(x.size // x.shape[0])
+
         batch_size = x.shape[0]
 
         # compute adaptive filter
         W = self.predictor(z)
 
-        # reshape W to the correct size 10 x 784
+        # reshape linear W to the correct size
         W = F.reshape(W, [batch_size] + self.shape)
+
+        # add constant W if defined
+        if self.constantW:
+            W += F.tile(self.C,(batch_size,1,1))
 
         # multiply weights with inputs in batch mode
         y = F.squeeze(F.batch_matmul(W, x), 2)
