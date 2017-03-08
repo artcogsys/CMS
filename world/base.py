@@ -60,11 +60,12 @@ class Iterator(object):
 
 class World(object):
 
-    def __init__(self, agents, out='result'):
+    def __init__(self, agents, out='result', labels=None):
         """ A world is inhabited by one or more agents
 
         :param agents:
         :param out: output folder
+        :param labels: labels for line plots
         """
 
         if not isinstance(agents, list):
@@ -83,7 +84,7 @@ class World(object):
 
         # optional labels for plotting
         # Note that validate follows the order ['training-0', 'validation-0', 'training-1', 'validation-1']
-        self.labels = None
+        self.labels = labels
 
     def save_snapshot(self, idx):
         for i in range(self.n_agents):
@@ -112,8 +113,8 @@ class World(object):
         """
 
         if plot:
-            loss_monitor = Oscilloscope(ylabel='loss')
             labels = self.get_labels(train, validation)
+            loss_monitor = Oscilloscope(ylabel='loss', names=labels)
 
         # initialization for validation
         min_loss = [None] * self.n_agents

@@ -82,7 +82,10 @@ class Oscilloscope(Monitor):
 
         # set a separate figure for each oscilloscope
 
-        keys = self.keys()
+        if self.names is None:
+            keys = self.keys()
+        else:
+            keys = self.names
 
         if self.fig is None:
 
