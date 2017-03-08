@@ -76,21 +76,29 @@ def accuracy(Y, T):
 def confusion_matrix(Y, T):
     """Compute confusion matrix
 
-   :param Y: predictions as one-hot vectors
-   :param T: targets as integers
-   :return: confusion matrix
+   :param Y: predictions as one-hot vectors or integers
+   :param T: targets as one-hot vectors or integers
+   :return: confusion matrix with true class as rows and predicted class as columns
    """
 
-    [n_samples, n_vars] = Y.shape
+    # compute one-hot vectors to integers
+    if Y.ndim > 1:
+        Y = np.argmax(Y,axis=0)
+
+    if T.ndim > 1:
+        T = np.argmax(T, axis=0)
+
+    classes = np.unique(np.vstack([T, Y]))
+
+    n_vars = len(classes)
 
     # compute count matrix
     count_mat = np.zeros([n_vars, n_vars])
     for i in range(n_vars):
 
-        # get predictions for trials with real class equal to i
-        clf = np.argmax(Y[T == i], axis=1)
+        idx = np.where(T == classes[i])[0]
         for j in range(n_vars):
-            count_mat[i, j] = np.sum(clf == j)
+            count_mat[i, j] = np.sum(Y[idx]==classes[j])
 
     conf_mat = np.zeros([n_vars, n_vars])
     for i in range(n_vars):

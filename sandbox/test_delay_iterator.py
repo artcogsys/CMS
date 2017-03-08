@@ -85,7 +85,7 @@ class MyRNN(Chain, Network):
 # parameters
 n_epochs = 500
 
-# get training and validation data - note that we select a subset of datapoints
+# get training and validation data - note that we select a subset of datapoints (n_samples is nr of samples per class)
 train_data = MNISTData(test=False, convolutional=False, n_samples=1000)
 val_data = MNISTData(test=True, convolutional=False, n_samples=1000)
 

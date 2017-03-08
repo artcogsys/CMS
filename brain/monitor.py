@@ -24,7 +24,8 @@ class Monitor(object):
         self.dict = defaultdict(list)
 
     def set(self, name, value):
-        """
+        """Monitor cannot make shallow copies since we use it to store chainer Variables as well for RL buffering.
+           Make an explicit copy of any variable you wish to store without having call by reference behaviour
 
         :param name: dictionary key
         :param value: dictionary value
@@ -95,7 +96,7 @@ class Oscilloscope(Monitor):
                 self.ax.set_ylabel(self.ylabel)
             self.hl = np.empty(len(keys), dtype=object)
             for i in range(len(keys)):
-                key = self.keys()[i]
+                key = keys[i]
                 self.hl[i], = self.ax.plot(np.arange(self[key].size), self[key])
             self.fig.legend(self.hl, tuple(keys))
             self.fig.show()

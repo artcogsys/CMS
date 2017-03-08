@@ -1,5 +1,6 @@
 from base import Iterator
 import numpy as np
+import copy
 
 ###
 # Simple MDP task
@@ -26,7 +27,7 @@ class Foo(Iterator):
         self.p = p
 
         self.n_action = 1 # number of action variables
-        self.n_output = 2 # number of output variables for the agent (discrete case)
+        self.n_output = 2 # number of output variables (actions) for the agent (discrete case)
         self.n_states = 1 # number of state variables
 
     def __iter__(self):
@@ -55,6 +56,9 @@ class Foo(Iterator):
         :return:
         """
 
+        if self.monitor:
+            map(lambda x: x.set('accuracy', 1.0 * np.sum(agent.action == self.state) / agent.action.size), self.monitor)
+
         self.reward = (2 * (agent.action == self.state) - 1).astype('float32')
 
         # this task always produces a new observation after each decision
@@ -68,7 +72,7 @@ class Foo(Iterator):
         :return: new state
         """
 
-        return np.random.choice(2, [self.batch_size, 1], True, [0.5, 0.5]).astype('int32')
+        return np.random.choice(2, self.batch_size, True, [0.5, 0.5]).astype('int32')
 
     def get_observation(self):
         """
@@ -116,7 +120,7 @@ class ProbabilisticCategorizationTask(Iterator):
 
     """
 
-    def __init__(self, odds = [0.25, 0.75, 1.5, 2.5], nsteps = None, batch_size=1, n_batches=np.inf):
+    def __init__(self, odds = [0.25, 0.75, 1.5, 2.5], batch_size=1, n_batches=np.inf):
         """
 
         :param: odds : determines odds ratio
@@ -134,7 +138,7 @@ class ProbabilisticCategorizationTask(Iterator):
         self.q = (1.0/self.odds)/float(np.sum(1.0/self.odds))
 
         self.n_input = len(self.p)
-        self.n_output = 3 # number of output variables
+        self.n_output = 3 # number of output variables (actions)
 
         self.rewards = [-1, 15, -100]
 
@@ -166,7 +170,12 @@ class ProbabilisticCategorizationTask(Iterator):
 
     def process(self, agent):
 
+        if self.monitor:
+            map(lambda x: x.set('accuracy', 1.0 * np.sum(agent.action == self.state) / agent.action.size), self.monitor)
+
         obs = np.zeros([self.batch_size, self.n_input], dtype='float32')
+
+        self.reward = np.zeros(len(agent.action), dtype=np.float32)
 
         # handle cases where new piece of evidence is requested
         idx = np.where(agent.action == 0)[0]
@@ -194,46 +203,78 @@ class ProbabilisticCategorizationTask(Iterator):
 #####
 ## Data task - takes a dataset and keeps spitting out the same (corrupted) stimulus until an agent decides on the category
 
-class DelayIterator(Iterator):
+class DataTask(Iterator):
 
-    def __init__(self, data, n_batches, batch_size=None, noise=0):
+    def __init__(self, data, batch_size=1, n_batches=np.inf, noise=0, rewards=[-1, 10, -10]):
 
         batch_size = batch_size or len(data)
 
-        super(DelayIterator, self).__init__(data, batch_size=batch_size, n_batches=n_batches)
+        super(DataTask, self).__init__(batch_size=batch_size, n_batches=n_batches)
+
+        self.data = data
+
+        self.n_samples = len(data)
+        self.n_input = data[0][0].size
+
+        # number of actions. Last action is the decision to accumulate more information
+        self.n_output = np.unique(map(lambda x: x[1], data)).size + 1
 
         # flags noise level
         self.noise = noise
 
+        # rewards/costs for asking for a new observation, deciding on the right category, deciding on the wrong category
+        self.rewards = rewards
+
+        # normalize rewards
+        self.rewards = np.array(self.rewards, dtype='float32') / np.max(np.abs(self.rewards)).astype('float32')
+
+        self.state = None
+        self.obs = None
+        self.reward = None
+
     def __iter__(self):
 
-        self.idx = 0
+        self.idx = -1
 
         # generate another random batch in each epoch
-        self._order = np.random.permutation(len(self.data))[:self.batch_size]
+        _order = np.random.permutation(self.n_samples)[:self.batch_size]
+
+        # keep track of true class
+        self.state = self.data[_order][1]
+
+        # generate data
+        self.obs = self.data[_order][0]
+
+        self.reward = None
 
         return self
 
     def next(self):
 
-        if self.idx == self.n_batches:
+        if self.idx == self.n_batches-1:
             raise StopIteration
 
         self.idx += 1
 
-        d_shape = self.data[self._order][0].shape
-        d_size = self.data[self._order][0].size
+        if self.monitor:
+            map(lambda x: x.set('state', copy.copy(self.state)), self.monitor)
+
+        return self.add_noise(self.obs), self.reward
+
+    def add_noise(self, data):
+
+        d_shape = data.shape
+        d_size = data.size
 
         # create noise component
         noise = np.zeros(d_size)
-        n = int(np.ceil(self.noise*d_size))
+        n = int(np.ceil(self.noise * d_size))
         noise[np.random.permutation(d_size)[:n]] = np.random.rand(n)
         noise = noise.reshape(d_shape)
 
-        data = self.data[self._order]
-        data[0][noise!=0] = noise[noise!=0]
+        data[noise != 0] = noise[noise != 0]
 
-        return list(data)
+        return data
 
     def process(self, agent):
         """ Process agent action, compute reward and generate new state and observation
@@ -242,9 +283,33 @@ class DelayIterator(Iterator):
         :return:
         """
 
-        self.reward = (2 * (agent.action == self.state) - 1).astype('float32')
+        if self.monitor:
+            map(lambda x: x.set('accuracy', 1.0*np.sum(agent.action == self.state)/agent.action.size), self.monitor)
 
-        # this task always produces a new observation after each decision
-        self.state = self.get_state()
+        self.reward = np.zeros(len(agent.action), dtype=np.float32)
 
-        self.obs = self.get_observation()
+        # handle cases in minibatch where action is to ask for another observation
+        wait_idx = np.where(agent.action.squeeze() == self.n_output-1)[0]
+
+        # cost associated with asking for a new observation
+        self.reward[wait_idx] = self.rewards[0]
+
+        # handle cases in minibatch where action was to choose the correct category
+        true_idx = np.where(agent.action.squeeze() == self.state)[0]
+
+        # add rewards
+        self.reward[true_idx] = self.rewards[1]
+
+        # handle cases in minibatch where action was to choose the incorrect category
+        false_idx = np.where(agent.action.squeeze() != self.state)[0]
+
+        # add rewards
+        self.reward[false_idx] = self.rewards[2]
+
+        # create new states and observations for true_idx and false_idx
+
+        update_idx = np.setdiff1d(np.arange(self.batch_size), wait_idx)
+
+        _order = np.random.permutation(self.n_samples)[:update_idx.size]
+        self.state[update_idx] = self.data[_order][1]
+        self.obs[update_idx] = self.data[_order][0]

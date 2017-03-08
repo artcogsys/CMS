@@ -15,6 +15,8 @@ class Iterator(object):
         self.batch_size = batch_size
         self.n_batches = n_batches
 
+        self.monitor = []
+
     def __iter__(self):
 
         self.idx = -1
@@ -46,6 +48,10 @@ class Iterator(object):
         """
 
         raise NotImplementedError
+
+    def add_monitor(self, monitor):
+        # used to store computed states
+        self.monitor.append(monitor)
 
     def render(self, agent):
         """TO DO: Rendering function to track input-output over time
@@ -149,7 +155,7 @@ class World(object):
                     self.save_snapshot(idx)
 
                 # if monitor is defined then run optional monitoring function
-                if monitor > 0 and idx % monitor == 0:
+                if monitor > 0 and idx > 0 and idx % monitor == 0:
                     map(lambda x: map(lambda z: z.run(), x.monitor) if x.monitor else None, self.agents)
 
                 cum_loss += losses

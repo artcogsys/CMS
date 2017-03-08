@@ -186,12 +186,13 @@ class MNISTData(TupleDataset):
     Handwritten character dataset; example of handling convolutional input
     """
 
-    def __init__(self, test=False, convolutional=True, n_samples=None):
+    def __init__(self, test=False, convolutional=True, n_samples=None, classes=None):
         """
 
         :param test: return test instead of training set
         :param convolutional: return convolutional representation or not
         :param n_samples: return n_samples samples per class
+        :param classes: if specified then the list items indicate the classes to return
         """
 
         if test:
@@ -210,8 +211,11 @@ class MNISTData(TupleDataset):
 
         self._n_output = (np.max(T) + 1)
 
+        if classes is None:
+            classes = np.unique(T)
+
         if n_samples:
-            idx = [np.where(T==u)[0][:n_samples] for u in np.unique(T)]
+            idx = [np.where(T==u)[0][:n_samples] for u in classes]
             idx = list(itertools.chain(*idx))
             X = X[idx]
             T = T[idx]
@@ -226,12 +230,14 @@ class MNISTData(TupleDataset):
 
 class CIFARData(TupleDataset):
 
-    def __init__(self, test=False, convolutional=True, n_samples=None):
+    def __init__(self, test=False, convolutional=True, n_samples=None, classes=None):
         """
 
        :param test: return test instead of training set
        :param convolutional: return convolutional representation or not
        :param n_samples: return n_samples samples per class
+       :param classes: if specified then the list items indicate the classes to return
+
        """
 
         if convolutional:
@@ -251,6 +257,9 @@ class CIFARData(TupleDataset):
         else:
             self._n_input = np.prod(X.shape[1:])
         self._n_output = (np.max(T) + 1)
+
+        if classes is None:
+            classes = np.unique(T)
 
         if n_samples:
             idx = [np.where(T == u)[0][:n_samples] for u in np.unique(T)]

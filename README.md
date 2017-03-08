@@ -161,6 +161,13 @@ Agents running on environments
 * why does loss increase for RLagent? Make REINFORCE non actor-critic
 * Implement ProbabilisticCategorizationTask
 * Implement AAL
-* Make REINFORCE work with batch size of 1
-* Add terminal state?
 * Use chainer's Reporter object to replace Monitor?
+* Allow iterators to add to monitor; update this across CMS
+* Confusion matrix should operate on integer representations
+* Do we use the predict function of models?
+* Can we make this predict function return a selected state instead of a softmax output?
+* Add terminal state?
+* Why does loss not go down for RL agent?
+* Add other RL algorithms
+* Compare RL efficacy
+

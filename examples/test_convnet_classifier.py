@@ -10,7 +10,7 @@ from world.data import *
 # parameters
 n_epochs = 10
 
-# get training and validation data - note that we select a subset of datapoints
+# get training and validation data - note that we select a subset of datapoints (n_samples is nr of samples per class)
 train_data = MNISTData(test=False, convolutional=True, n_samples=100)
 val_data = MNISTData(test=True, convolutional=True, n_samples=100)
 

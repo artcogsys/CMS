@@ -160,6 +160,12 @@ class ActorCriticModel(Model):
         # separate observation from reward
         x = data[0] if len(data) == 2 else data[:-1]  # inputs
 
+        if self.monitor:
+            if isinstance(x, list):
+                map(lambda v: v.set('input', np.hstack(map(lambda z: z.data, x))), self.monitor)
+            else:
+                map(lambda v: v.set('input', x.data), self.monitor)
+
         # linear outputs reflecting the log action probabilities and the value
         out = self.predictor(x, train)
 
@@ -167,11 +173,14 @@ class ActorCriticModel(Model):
 
         value = out[:,-1]
 
-        # handle case where we have only one element per batch
-        if value.ndim == 1:
-            value = F.expand_dims(value, axis=1)
+        # # handle case where we have only one element per batch
+        # if value.ndim == 1:
+        #     value = F.expand_dims(value, axis=1)
 
         action = self.get_action(policy)
+
+        if self.monitor:
+            map(lambda x: x.set('action', action), self.monitor)
 
         return action, policy, value
 
@@ -194,5 +203,5 @@ class ActorCriticModel(Model):
 
         # discrete representation
         n_out = self.predictor.n_output-1
-        batch_size = policy.shape[0]
-        return np.array([np.random.choice(n_out, None, True, p[i]) for i in range(p.shape[0])], dtype='int32').reshape([batch_size, 1])
+
+        return np.array([np.random.choice(n_out, None, True, p[i]) for i in range(p.shape[0])], dtype='int32')
