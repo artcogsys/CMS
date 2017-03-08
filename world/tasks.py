@@ -190,3 +190,61 @@ class ProbabilisticCategorizationTask(Iterator):
             self.state[i] = np.int32(np.random.randint(1, 3))
 
         self.obs = obs
+
+#####
+## Data task - takes a dataset and keeps spitting out the same (corrupted) stimulus until an agent decides on the category
+
+class DelayIterator(Iterator):
+
+    def __init__(self, data, n_batches, batch_size=None, noise=0):
+
+        batch_size = batch_size or len(data)
+
+        super(DelayIterator, self).__init__(data, batch_size=batch_size, n_batches=n_batches)
+
+        # flags noise level
+        self.noise = noise
+
+    def __iter__(self):
+
+        self.idx = 0
+
+        # generate another random batch in each epoch
+        self._order = np.random.permutation(len(self.data))[:self.batch_size]
+
+        return self
+
+    def next(self):
+
+        if self.idx == self.n_batches:
+            raise StopIteration
+
+        self.idx += 1
+
+        d_shape = self.data[self._order][0].shape
+        d_size = self.data[self._order][0].size
+
+        # create noise component
+        noise = np.zeros(d_size)
+        n = int(np.ceil(self.noise*d_size))
+        noise[np.random.permutation(d_size)[:n]] = np.random.rand(n)
+        noise = noise.reshape(d_shape)
+
+        data = self.data[self._order]
+        data[0][noise!=0] = noise[noise!=0]
+
+        return list(data)
+
+    def process(self, agent):
+        """ Process agent action, compute reward and generate new state and observation
+
+        :param agent:
+        :return:
+        """
+
+        self.reward = (2 * (agent.action == self.state) - 1).astype('float32')
+
+        # this task always produces a new observation after each decision
+        self.state = self.get_state()
+
+        self.obs = self.get_observation()

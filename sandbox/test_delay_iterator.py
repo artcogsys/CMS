@@ -23,7 +23,7 @@ class DelayIterator(SequentialIterator):
 
     def __iter__(self):
 
-        self.idx = 0
+        self.idx = -1
 
         # generate another random batch in each epoch
         self._order = np.random.permutation(len(self.data))[:self.batch_size]
@@ -32,7 +32,7 @@ class DelayIterator(SequentialIterator):
 
     def next(self):
 
-        if self.idx == self.n_batches:
+        if self.idx == self.n_batches - 1:
             raise StopIteration
 
         self.idx += 1
