@@ -22,7 +22,7 @@ data_iter = DataTask(train_data, batch_size=32, n_batches = 10000, noise=0, rewa
 n_output = data_iter.n_output + 1
 
 # define brain of agent
-model = ActorCriticModel(MLP(data_iter.n_input, n_output, n_hidden=30))
+model = ActorCriticModel(RNN(data_iter.n_input, n_output, n_hidden=30))
 
 # define agent
 agent = AACAgent(model, chainer.optimizers.Adam(), cutoff=10)
@@ -31,7 +31,8 @@ agent = AACAgent(model, chainer.optimizers.Adam(), cutoff=10)
 agent.optimizer.add_hook(chainer.optimizer.GradientClipping(5))
 
 # add oscilloscope
-agent.add_monitor(Oscilloscope(names=['return']))
+agent.add_monitor(Oscilloscope(names=['cumulative reward']))
+#agent.add_monitor(Oscilloscope(names=['return']))
 
 monitor = Oscilloscope(names=['accuracy'])
 data_iter.add_monitor(monitor)

@@ -170,4 +170,6 @@ Agents running on environments
 * Why does loss not go down for RL agent?
 * Add other RL algorithms
 * Compare RL efficacy
+* Can we get rid of epochs alltogether? Simplifies World code
+* Test probabilistic categorization and compare with NRL
 

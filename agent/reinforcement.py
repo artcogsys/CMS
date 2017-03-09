@@ -62,6 +62,9 @@ class REINFORCEAgent(ActorCriticAgent):
         # monitor score, entropy and reward
         self.buffer = Monitor()
 
+        # keep track of cumulative reward
+        self.cum_reward = 0
+
         super(REINFORCEAgent, self).__init__(model, optimizer=optimizer, gpu=gpu)
 
     def run(self, data, train=True, idx=None, final=False):
@@ -78,6 +81,11 @@ class REINFORCEAgent(ActorCriticAgent):
         reward = data[-1]
         if not reward is None:
             self.buffer.set('reward', reward)
+            self.cum_reward += reward
+
+        # store cumulative reward
+        if self.monitor:
+            map(lambda x: x.set('cumulative reward', np.mean(self.cum_reward)), self.monitor)
 
         # compute policy and take new action based on observations
         self.action, policy, _ = self.model(map(lambda x: Variable(self.xp.asarray(x)), data), train=train)
@@ -161,6 +169,9 @@ class AACAgent(ActorCriticAgent):
         # monitor score, entropy and reward
         self.buffer = Monitor()
 
+        # keep track of cumulative reward
+        self.cum_reward = 0
+
         super(AACAgent, self).__init__(model, optimizer=optimizer, gpu=gpu)
 
     def run(self, data, train=True, idx=None, final=False):
@@ -177,6 +188,11 @@ class AACAgent(ActorCriticAgent):
         reward = data[-1]
         if not reward is None:
             self.buffer.set('reward', reward)
+            self.cum_reward += reward
+
+        # store cumulative reward
+        if self.monitor:
+            map(lambda x: x.set('cumulative reward', np.mean(self.cum_reward)), self.monitor)
 
         # compute policy and take new action based on observations
         self.action, policy, value = self.model(map(lambda x: Variable(self.xp.asarray(x)), data), train=train)
