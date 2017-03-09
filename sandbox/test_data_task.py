@@ -27,7 +27,7 @@ model = ActorCriticModel(RNN(data_iter.n_input, n_output, n_hidden=30))
 # define agent
 agent = AACAgent(model, chainer.optimizers.Adam(), cutoff=10)
 
-# add gradient clipping
+# add gradient clipping 
 agent.optimizer.add_hook(chainer.optimizer.GradientClipping(5))
 
 # add oscilloscope
