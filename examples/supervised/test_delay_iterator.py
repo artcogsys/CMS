@@ -70,9 +70,9 @@ class MyRNN(Chain, Network):
             l2=L.Linear(n_hidden, n_output)
         )
 
-        self.ninput = n_input
-        self.nhidden = n_hidden
-        self.noutput = n_output
+        self.n_input = n_input
+        self.n_hidden = n_hidden
+        self.n_output = n_output
 
     def __call__(self, x, train=False):
 

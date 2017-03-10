@@ -22,7 +22,7 @@ data_iter = DataTask(train_data, batch_size=32, n_batches = 10000, noise=0, rewa
 n_output = data_iter.n_output + 1
 
 # define brain of agent
-model = ActorCriticModel(RNN(data_iter.n_input, n_output, n_hidden=30))
+model = ActorCriticModel(RNN(data_iter.n_input, n_output, n_hidden=30, link=L.StatefulGRU)) #link=Elman))
 
 # define agent
 agent = AACAgent(model, chainer.optimizers.Adam(), cutoff=10)
