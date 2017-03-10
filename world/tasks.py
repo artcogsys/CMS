@@ -288,12 +288,6 @@ class DataTask(Iterator):
 
         self.reward = np.zeros(len(agent.action), dtype=np.float32)
 
-        # handle cases in minibatch where action is to ask for another observation
-        wait_idx = np.where(agent.action.squeeze() == self.n_output-1)[0]
-
-        # cost associated with asking for a new observation
-        self.reward[wait_idx] = self.rewards[0]
-
         # handle cases in minibatch where action was to choose the correct category
         true_idx = np.where(agent.action.squeeze() == self.state)[0]
 
@@ -305,6 +299,12 @@ class DataTask(Iterator):
 
         # add rewards
         self.reward[false_idx] = self.rewards[2]
+
+        # handle cases in minibatch where action is to ask for another observation
+        wait_idx = np.where(agent.action.squeeze() == self.n_output-1)[0]
+
+        # cost associated with asking for a new observation
+        self.reward[wait_idx] = self.rewards[0]
 
         # create new states and observations for true_idx and false_idx
 

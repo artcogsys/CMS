@@ -211,7 +211,7 @@ class AACAgent(ActorCriticAgent):
 
                 advantage = _return - self.buffer.dict['value'].pop()
 
-                _ss = F.squeeze(self.buffer.dict['score'].pop()) * advantage.data
+                _ss = F.squeeze(self.buffer.dict['score'].pop(),axis=1) * advantage.data
                 if _ss.size > 1:
                     _ss = F.sum(_ss, axis=0)
 
