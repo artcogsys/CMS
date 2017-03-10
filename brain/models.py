@@ -158,7 +158,7 @@ class ActorCriticModel(Model):
         """
 
         # separate observation from reward
-        x = data[0] if len(data) == 2 else data[:-1]  # inputs
+        x = data[0] if len(data) == 3 else data[:-2]  # inputs (rest is reward and terminal state)
 
         if self.monitor:
             if isinstance(x, list):

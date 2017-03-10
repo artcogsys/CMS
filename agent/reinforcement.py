@@ -78,10 +78,13 @@ class REINFORCEAgent(ActorCriticAgent):
         """
 
         # get reward associated with taking the previous action in the previous state
-        reward = data[-1]
+        reward = data[-2]
         if not reward is None:
             self.buffer.set('reward', reward)
             self.cum_reward += reward
+
+        # get terminal state
+        terminal = data[-1]
 
         # store cumulative reward
         if self.monitor:
@@ -185,10 +188,13 @@ class AACAgent(ActorCriticAgent):
         """
 
         # get reward associated with taking the previous action in the previous state
-        reward = data[-1]
+        reward = data[-2]
         if not reward is None:
             self.buffer.set('reward', reward)
             self.cum_reward += reward
+
+        # get terminal state
+        terminal = data[-1]
 
         # store cumulative reward
         if self.monitor:
@@ -198,10 +204,10 @@ class AACAgent(ActorCriticAgent):
         self.action, policy, value = self.model(map(lambda x: Variable(self.xp.asarray(x)), data), train=train)
 
         # backpropagate if we reach the cutoff for truncated backprop or if we processed the last batch
-        if train and idx > 0 and ((self.cutoff and (idx % self.cutoff) == 0) or final):
+        if train and idx > 0 and ((self.cutoff and (idx % self.cutoff) == 0) or final or (len(terminal)==1 and terminal)):
 
             # return value associated with last state
-            _return = value
+            _return = value * terminal
 
             pi_loss = Variable(self.xp.zeros((), 'float32'))
             v_loss = Variable(self.xp.zeros((), 'float32'))

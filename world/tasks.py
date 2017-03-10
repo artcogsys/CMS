@@ -36,6 +36,7 @@ class Foo(Iterator):
         self.state = self.get_state()
         self.obs = self.get_observation()
         self.reward = None
+        self.terminal = None
 
         return self
 
@@ -47,7 +48,7 @@ class Foo(Iterator):
         self.idx += 1
 
         # return new observation and reward associated with agent's choice
-        return self.obs, self.reward
+        return self.obs, self.reward, np.zeros(self.batch_size, dtype=np.bool)
 
     def process(self, agent):
         """ Process agent action, compute reward and generate new state and observation
@@ -148,6 +149,7 @@ class ProbabilisticCategorizationTask(Iterator):
         self.state = None
         self.obs = None
         self.reward = None
+        self.terminal = None
 
     def __iter__(self):
 
@@ -155,6 +157,7 @@ class ProbabilisticCategorizationTask(Iterator):
         self.state = np.int32(np.random.randint(1, 3, size=[self.batch_size,1]))
         self.obs = np.zeros([self.batch_size, self.n_input], dtype='float32')
         self.reward = None
+        self.terminal = np.zeros(self.batch_size, dtype=np.bool)
 
         return self
 
@@ -165,8 +168,8 @@ class ProbabilisticCategorizationTask(Iterator):
 
         self.idx += 1
 
-        # return new observation and reward associated with agent's choice
-        return self.obs, self.reward
+        # return new observation and reward associated with agent's choice and terminal state
+        return self.obs, self.reward, self.terminal
 
     def process(self, agent):
 
@@ -186,6 +189,7 @@ class ProbabilisticCategorizationTask(Iterator):
             else:
                 evidence = np.random.choice(self.n_input, p=self.q)
             obs[i,evidence] = 1
+        self.terminal[idx] = 0
 
         # handle cases where left or right was chosen
         idx = np.where(agent.action != 0)[0]
@@ -197,6 +201,7 @@ class ProbabilisticCategorizationTask(Iterator):
                 self.reward[i] = self.rewards[2]
 
             self.state[i] = np.int32(np.random.randint(1, 3))
+        self.terminal[idx] = 1
 
         self.obs = obs
 
@@ -231,6 +236,7 @@ class DataTask(Iterator):
         self.state = None
         self.obs = None
         self.reward = None
+        self.terminal = None
 
     def __iter__(self):
 
@@ -247,6 +253,8 @@ class DataTask(Iterator):
 
         self.reward = None
 
+        self.terminal = np.zeros(self.batch_size, dtype=np.bool)
+
         return self
 
     def next(self):
@@ -259,7 +267,7 @@ class DataTask(Iterator):
         if self.monitor:
             map(lambda x: x.set('state', copy.copy(self.state)), self.monitor)
 
-        return self.add_noise(self.obs), self.reward
+        return self.add_noise(self.obs), self.reward, self.terminal
 
     def add_noise(self, data):
 
@@ -282,9 +290,6 @@ class DataTask(Iterator):
         :param agent:
         :return:
         """
-
-        if self.monitor:
-            map(lambda x: x.set('accuracy', 1.0*np.sum(agent.action == self.state)/agent.action.size), self.monitor)
 
         self.reward = np.zeros(len(agent.action), dtype=np.float32)
 
@@ -310,6 +315,17 @@ class DataTask(Iterator):
 
         update_idx = np.setdiff1d(np.arange(self.batch_size), wait_idx)
 
+        # compute accuracy on those trials for which a decision is being made
+        if self.monitor:
+            if update_idx.size > 0:
+                map(lambda x: x.set('accuracy', 1.0*np.sum(agent.action[update_idx] == self.state[update_idx])/update_idx.size), self.monitor)
+            else:
+                map(lambda x: x.set('accuracy', None), self.monitor)
+
         _order = np.random.permutation(self.n_samples)[:update_idx.size]
         self.state[update_idx] = self.data[_order][1]
         self.obs[update_idx] = self.data[_order][0]
+
+        # compute which ones are terminal states
+        self.terminal[update_idx] = 1
+        self.terminal[wait_idx] = 0
