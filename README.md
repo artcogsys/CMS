@@ -175,6 +175,12 @@ Agents running on environments
 is tricky given batch_size>1; terminal states make it hard as well.
 Can we get rid of terminal states alltogether?
 * equalize final and terminal
-* Get rid of epochs altogether. Simplifies World code
+* Get rid of epochs altogether. Simplifies World code; make it possible
+to plot both training and validation part within an epoch; impossible to
+ do efficiently with stateful..
+ * how to make validation happen in parallel? model copy is expensive
+ unless we do this every n iterations when plotting is required...
+ ways to inherit a reference to parameters?
+* Treat loss as monitor?
 
 

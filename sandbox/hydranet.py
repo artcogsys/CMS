@@ -7,6 +7,7 @@ from chainer.datasets import *
 from brain.monitor import Monitor
 from brain.networks import *
 from world.base import *
+import matplotlib.pyplot as plt
 
 #####
 ## Hydranet RNN
@@ -20,6 +21,8 @@ class HydraRNN(Chain, Network):
             l2=L.Linear(n_hidden, n_input),
         )
 
+        self.monitor = []
+
     def __call__(self, x, train=False):
 
         h = self.l1(F.dropout(x, train=True))
@@ -29,6 +32,7 @@ class HydraRNN(Chain, Network):
 
     def reset_state(self):
         self.l1.reset_state()
+
 
 #####
 ## Hydranet iterator
@@ -55,20 +59,20 @@ class HydraIterator(Iterator):
 
     def __iter__(self):
 
-        self.idx = 0
+        self.idx = -1
 
         return self
 
     def next(self):
 
         # never stop iterating during life-long learning
-        if self.idx == self.n_batches:
+        if self.idx == self.n_batches-1:
             raise StopIteration
+
+        self.idx += 1
 
         if self.idx % self.n_update == 0:
             self._order = np.random.permutation(len(self.data))[0:self.batch_size]
-
-        self.idx += 1
 
         # self.data[self._order[i:(i + self.batch_size)]]
         data = self.data[self._order]
@@ -78,6 +82,11 @@ class HydraIterator(Iterator):
         noise[mask] = np.random.rand(np.sum(mask==True))
 
         return [noise, data]
+
+    def process(self, agent):
+        pass
+
+
 
 #####
 ## Create custom monitor

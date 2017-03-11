@@ -128,4 +128,4 @@ agent3.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
 world = World([agent1, agent2, agent3], labels=['recurrent train', 'recurrent test', 'feedforward train', 'feedforward test', 'AR train', 'AR test'])
 
 # run world in training mode with validation
-world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=-1)
+world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=100)

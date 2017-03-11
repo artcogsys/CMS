@@ -2,6 +2,7 @@ from __future__ import division
 
 import numpy as np
 from chainer import cuda
+import copy
 
 class Agent(object):
 
@@ -29,6 +30,12 @@ class Agent(object):
         self.reset()
 
         self.monitor = []
+
+    def __deepcopy__(self, memodict={}):
+        # used to create copied agents for validation purposes
+        c_agent = self.__class__(copy.deepcopy(self.model), copy.deepcopy(self.optimizer))
+        c_agent.xp = self.xp
+        return c_agent
 
     def add_monitor(self, monitor):
 

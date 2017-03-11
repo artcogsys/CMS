@@ -1,6 +1,7 @@
 from __future__ import division
 
 import os
+import copy
 import numpy as np
 import tqdm
 from brain.monitor import Oscilloscope
@@ -92,24 +93,20 @@ class World(object):
         # Note that validate follows the order ['training-0', 'validation-0', 'training-1', 'validation-1']
         self.labels = labels
 
-    def save_snapshot(self, idx):
-        for i in range(self.n_agents):
-            self.agents[i].model.save(os.path.join(self.out, 'agent-{0:04d}-snapshot-{1:04d}'.format(i, idx)))
-
     def train(self, data_iter, n_epochs=1, plot=0, snapshot=0, monitor=0):
-        self.run(data_iter, validation=None, train=True, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
+        self.run(data_iter, val_iter=None, train=True, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
 
     def test(self, data_iter, n_epochs=1, plot=0, snapshot=0, monitor=0):
-        self.run(data_iter, validation=None, train=False, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
+        self.run(data_iter, val_iter=None, train=False, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
 
     def validate(self, data_iter, validation, n_epochs=1, plot=0, snapshot=0, monitor=0):
-        self.run(data_iter, validation=validation, train=True, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
+        self.run(data_iter, val_iter=validation, train=True, n_epochs=n_epochs, plot=plot, snapshot=snapshot, monitor=monitor)
 
-    def run(self, data_iter, validation=None, train=False, n_epochs=1, plot=0, snapshot=0, monitor=0):
+    def run(self, data_iter, val_iter=None, train=False, n_epochs=1, plot=0, snapshot=0, monitor=0):
         """ Used to train, test and validate a model. Generalizes to the use of multiple agents
 
         :param data_iter: environment to train on
-        :param validation: environment to validate on
+        :param val_iter: environment to validate on
         :param train: run in train or test mode
         :param n_epochs: number of epochs to run an environment
         :param plot: plot change in loss - -1 : per epoch; > 0 : after this many iterations
@@ -118,101 +115,114 @@ class World(object):
         :return:
         """
 
+        # initialize plotting of loss
         if plot:
-            labels = self.get_labels(train, validation)
+            labels = self.get_labels(train, val_iter)
             loss_monitor = Oscilloscope(ylabel='loss', names=labels)
+
+        # initialize iterator
+        d_it = iter(data_iter)
+
+        # copy agents for purpose of validation
+        if val_iter:
+            val_agents = map(lambda x: copy.deepcopy(x), self.agents)
+            val_losses = np.zeros(self.n_agents)
+            v_it = iter(val_iter)
 
         # initialization for validation
         min_loss = [None] * self.n_agents
         optimal_model = [None] * self.n_agents
 
-        # iterate over epochs
-        for epoch in tqdm.tqdm(xrange(0, n_epochs)):
+        # maximal number of iterations is epochs * nr of batches (possibly infinite in case of task)
+        # In case of infinity, we cap iterations at maximal integer
+        max_iter = int(np.min([n_epochs * data_iter.n_batches, np.iinfo(np.int32).max]))
+
+        # initialize losses
+        losses = np.zeros(self.n_agents)
+
+        # iterate over indices
+        for _iter in tqdm.tqdm(xrange(0, max_iter)):
 
             # reset agents at start of each epoch
             map(lambda x: x.reset(), self.agents)
 
-            cum_loss = np.zeros(self.n_agents)
+            if val_iter:
+                map(lambda x: x.reset(), val_agents)
 
-            # iterate over batches
-            for data in data_iter:
+            try:
+                data = d_it.next()
+            except StopIteration:
+                d_it = iter(data_iter)
 
-                losses = map(lambda x: x.run(data, train=train, idx=data_iter.idx, final=data_iter.is_final()),
-                             self.agents)
+            losses += map(lambda x: x.run(data, train=train, idx=_iter, final=data_iter.is_final()),
+                         self.agents)
 
-                # the iterator can process actions of the agents that change the state of the iterator
-                # used in case of processing of tasks by RL agents
-                map(lambda x: data_iter.process(x), self.agents)
+            # the iterator can process actions of the agents that change the state of the iterator
+            # used in case of processing of tasks by RL agents
+            map(lambda x: data_iter.process(x), self.agents)
 
-                idx = data_iter.idx if np.isinf(data_iter.n_batches) else data_iter.idx + epoch * data_iter.n_batches
+            # run validation
+            if not val_iter is None:
 
-                if plot > 0 and idx % plot == 0:
-                    for i in range(len(self.agents)):
-                        loss_monitor.set(labels[i], losses)
-                    loss_monitor.run()
+                # copy parameters of trained model
+                for i in range(self.n_agents):
+                    val_agents[i].model.copyparams(self.agents[i].model)
 
-                if snapshot > 0 and idx % snapshot == 0:
-                    self.save_snapshot(idx)
+                # run on data point
+                try:
+                    val_data = v_it.next()
+                except StopIteration:
+                    v_it = iter(val_iter)
 
-                # if monitor is defined then run optional monitoring function
-                if monitor > 0 and idx > 0 and idx % monitor == 0:
-                    map(lambda x: map(lambda z: z.run(), x.monitor) if x.monitor else None, self.agents)
+                # compute validation loss
+                val_losses += map(lambda x: x.run(val_data, train=False), val_agents)
 
-                cum_loss += losses
-
-            # validate model (only possible for environments that run for a fixed number of steps)
-            if not validation is None:
-
-                map(lambda x: x.reset(), self.agents)
-
-                val_loss = np.zeros(self.n_agents)
-
-                for data in validation:
-
-                    losses = map(lambda x: x.run(data, train=False), self.agents)
-
-                    map(lambda x: data_iter.process(x), self.agents)
-
-                    val_loss += losses
+                map(lambda x: val_iter.process(x), val_agents)
 
                 # store best models in case we are validating
                 for i in range(self.n_agents):
 
                     if min_loss[i] is None:
-                        optimal_model[i] = self.agents[i].optimizer.target.copy()
-                        min_loss[i] = val_loss[i]
+                        optimal_model[i] = copy.deepcopy(val_agents[i].model)
+                        min_loss[i] = val_losses[i]
                     else:
-                        if val_loss[i] < min_loss[i]:
-                            optimal_model[i] = self.agents[i].optimizer.target.copy()
-                            min_loss[i] = val_loss[i]
+                        if val_losses[i] < min_loss[i]:
+                            optimal_model[i] = copy.deepcopy(val_agents[i].model)
+                            min_loss[i] = val_losses[i]
 
-            # plot cumulative loss averaged over number of batches of each agent
-            if plot == -1:
-                idx = 0
+            # plot loss - handled by a class-specific monitor
+            if plot > 0 and _iter > 0 and _iter % plot == 0:
                 for i in range(len(self.agents)):
-                    loss_monitor.set(labels[idx], cum_loss[i] / data_iter.n_batches)
-                    idx += 1
-                    if not validation is None:
-                        loss_monitor.set(labels[idx], val_loss[i] / validation.n_batches)
-                    idx += 1
+                    loss_monitor.set(labels[2*i], losses[i] / plot)
+                    if not val_iter is None:
+                        loss_monitor.set(labels[2*i+1], val_losses[i] / plot)
+                losses = np.zeros(self.n_agents)
+                val_losses = np.zeros(self.n_agents)
                 loss_monitor.run()
 
-            # store snapshot
-            if snapshot == -1:
-                self.save_snapshot(epoch)
+            # store model
+            self.save_snapshot(_iter, snapshot)
 
             # if monitor is defined then run optional monitoring function
-            if monitor == -1:
-                map(lambda x: map(lambda z: z.run(), x.monitor) if x.monitor else None, self.agents)
+            self.run_monitors(_iter, monitor)
 
         # each agent is assigned the best 'brain' according to validation loss
-        if not validation is None:
+        if not val_iter is None:
             for i in range(self.n_agents):
                 self.agents[i].model = optimal_model[i]
                 self.agents[i].optimizer.target = optimal_model[i]
 
         if plot:
             loss_monitor.save(os.path.join(self.out, 'loss'))
+
+    def save_snapshot(self, idx, snapshot):
+        if snapshot > 0 and idx > 0 and idx % snapshot == 0:
+            for i in range(self.n_agents):
+                self.agents[i].model.save(os.path.join(self.out, 'agent-{0:04d}-snapshot-{1:04d}'.format(i, idx)))
+
+    def run_monitors(self, idx, monitor):
+        if monitor > 0 and idx > 0 and idx % monitor == 0:
+            map(lambda x: map(lambda z: z.run(), x.monitor) if x.monitor else None, self.agents)
 
     def get_labels(self, train, validation):
 

@@ -31,7 +31,7 @@ agent.optimizer.add_hook(chainer.optimizer.WeightDecay(1e-5))
 world = World(agent)
 
 # run world in training mode with validation
-world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=-1)
+world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=10)
 
 # add monitor to model
 agent.add_monitor(Monitor())

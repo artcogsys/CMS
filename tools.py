@@ -81,12 +81,12 @@ def confusion_matrix(Y, T):
    :return: confusion matrix with true class as rows and predicted class as columns
    """
 
-    # compute one-hot vectors to integers
+    # convert one-hot vectors to integers
     if Y.ndim > 1:
-        Y = np.argmax(Y,axis=0)
+        Y = np.argmax(Y,axis=1)
 
     if T.ndim > 1:
-        T = np.argmax(T, axis=0)
+        T = np.argmax(T, axis=1)
 
     classes = np.unique(np.vstack([T, Y]))
 

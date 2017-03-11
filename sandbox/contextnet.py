@@ -160,4 +160,4 @@ world = World([agent1, agent2])
 world.labels = ['Context train', 'Context test', 'MLP train', 'MLP test']
 
 # run world in training mode with validation
-world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=-1)
+world.validate(train_iter, val_iter, n_epochs=n_epochs, plot=100)
