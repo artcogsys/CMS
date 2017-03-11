@@ -47,8 +47,8 @@ class Foo(Iterator):
 
         self.idx += 1
 
-        # return new observation and reward associated with agent's choice
-        return self.obs, self.reward, np.zeros(self.batch_size, dtype=np.bool)
+        # return new observation and reward associated with agent's choice, we are always in a terminal state
+        return self.obs, self.reward, np.ones(self.batch_size, dtype=np.bool)
 
     def process(self, agent):
         """ Process agent action, compute reward and generate new state and observation
@@ -132,9 +132,6 @@ class ProbabilisticCategorizationTask(Iterator):
 
         self.odds = np.array(odds)
 
-        # keep track of the iteration
-        self.idx = 0
-
         self.p = self.odds/float(np.sum(self.odds))
         self.q = (1.0/self.odds)/float(np.sum(1.0/self.odds))
 
@@ -146,18 +143,13 @@ class ProbabilisticCategorizationTask(Iterator):
         # normalize rewards
         self.rewards = np.array(self.rewards, dtype='float32') / np.max(np.abs(self.rewards)).astype('float32')
 
-        self.state = None
-        self.obs = None
-        self.reward = None
-        self.terminal = None
-
     def __iter__(self):
 
         self.idx = -1
         self.state = np.int32(np.random.randint(1, 3, size=[self.batch_size,1]))
         self.obs = np.zeros([self.batch_size, self.n_input], dtype='float32')
         self.reward = None
-        self.terminal = np.zeros(self.batch_size, dtype=np.bool)
+        self.terminal = np.ones(self.batch_size, dtype=np.bool)
 
         return self
 
@@ -172,9 +164,6 @@ class ProbabilisticCategorizationTask(Iterator):
         return self.obs, self.reward, self.terminal
 
     def process(self, agent):
-
-        if self.monitor:
-            map(lambda x: x.set('accuracy', 1.0 * np.sum(agent.action == self.state) / agent.action.size), self.monitor)
 
         obs = np.zeros([self.batch_size, self.n_input], dtype='float32')
 
@@ -202,6 +191,15 @@ class ProbabilisticCategorizationTask(Iterator):
 
             self.state[i] = np.int32(np.random.randint(1, 3))
         self.terminal[idx] = 1
+
+        # compute accuracy on those trials for which a decision is being made
+        if self.monitor:
+            if idx.size > 0:
+                map(lambda x: x.set('accuracy',
+                                    1.0 * np.sum(agent.action[idx] == self.state[idx]) / idx.size),
+                    self.monitor)
+            else:
+                map(lambda x: x.set('accuracy', None), self.monitor)
 
         self.obs = obs
 
@@ -233,11 +231,6 @@ class DataTask(Iterator):
         # normalize rewards
         self.rewards = np.array(self.rewards, dtype='float32') / np.max(np.abs(self.rewards)).astype('float32')
 
-        self.state = None
-        self.obs = None
-        self.reward = None
-        self.terminal = None
-
     def __iter__(self):
 
         self.idx = -1
@@ -253,7 +246,7 @@ class DataTask(Iterator):
 
         self.reward = None
 
-        self.terminal = np.zeros(self.batch_size, dtype=np.bool)
+        self.terminal = np.ones(self.batch_size, dtype=np.bool)
 
         return self
 

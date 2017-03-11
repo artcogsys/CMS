@@ -170,6 +170,11 @@ Agents running on environments
 * Why does loss not go down for RL agent?
 * Add other RL algorithms
 * Compare RL efficacy
-* Can we get rid of epochs alltogether? Simplifies World code
 * Test probabilistic categorization and compare with NRL
+* probcat task does not converge for new implementation; new implementation
+is tricky given batch_size>1; terminal states make it hard as well.
+Can we get rid of terminal states alltogether?
+* equalize final and terminal
+* Get rid of epochs altogether. Simplifies World code
+
 

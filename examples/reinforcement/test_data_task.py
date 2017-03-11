@@ -16,7 +16,7 @@ n_epochs = 1
 train_data = MNISTData(test=False, convolutional=False, n_samples=1000, classes = [0, 1])
 
 # define iterator
-data_iter = DataTask(train_data, batch_size=32, n_batches = 10000, noise=0, rewards=[-1, 50, -50])
+data_iter = DataTask(train_data, batch_size=1, n_batches = 10000, noise=0, rewards=[-1, 50, -50])
 
 # an actor-critic model assumes that the predictor's output is number of actions plus one for the value
 n_output = data_iter.n_output + 1
@@ -25,7 +25,7 @@ n_output = data_iter.n_output + 1
 model = ActorCriticModel(RNN(data_iter.n_input, n_output, n_hidden=30, link=L.StatefulGRU)) #link=Elman))
 
 # define agent
-agent = AACAgent(model, chainer.optimizers.Adam(), cutoff=10)
+agent = ActorCriticAgent(model, chainer.optimizers.Adam(), cutoff=10)
 
 # add gradient clipping 
 agent.optimizer.add_hook(chainer.optimizer.GradientClipping(5))

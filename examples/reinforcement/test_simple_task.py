@@ -1,5 +1,6 @@
 # Foo task tested with a random RL agent
 
+import os
 from agent.reinforcement import *
 from brain.monitor import *
 from brain.models import ActorCriticModel
@@ -12,32 +13,38 @@ from world.tasks import *
 n_epochs = 1  # a task can run for an infinite time
 
 # define iterator
-#data_iter = Foo(batch_size=32, n_batches = np.inf)
-data_iter = ProbabilisticCategorizationTask(batch_size=32, n_batches = np.inf)
+#data_iter = Foo(batch_size=1, n_batches = 2*10**3)
+data_iter = ProbabilisticCategorizationTask(batch_size=1, n_batches = 2*10**4)
 
 # an actor-critic model assumes that the predictor's output is number of actions plus one for the value
 n_output = data_iter.n_output + 1
 
 # define brain of agent
-model = ActorCriticModel(MLP(data_iter.n_input, n_output, n_hidden=10))
+model = ActorCriticModel(RNN(data_iter.n_input, n_output, n_hidden=5, link=L.StatefulGRU))
 
 # define agent - update model every 100 steps
-agent = AACAgent(model, chainer.optimizers.Adam(), cutoff=10)
+agent = ActorCriticAgent(model, chainer.optimizers.Adam(), cutoff=10)
 
 # add gradient clipping
 agent.optimizer.add_hook(chainer.optimizer.GradientClipping(5))
 
 # add monitors
 agent.add_monitor(Oscilloscope(names=['cumulative reward']))
-#agent.add_monitor(Oscilloscope(names=['return']))
-
-#monitor = Oscilloscope(names=['accuracy'])
-#data_iter.add_monitor(monitor)
-#agent.add_monitor(monitor)
 
 # define world
 world = World(agent)
 
-# run world in training mode - plot cumulative reward every 1 iterations
+# run world in training mode - plot cumulative reward every 100 iterations
 world.train(data_iter, n_epochs=n_epochs, plot=100, monitor=100)
 
+##  run in test mode
+
+data_iter = ProbabilisticCategorizationTask(batch_size=1, n_batches = 1*10**3)
+
+# reset cumulative reward monitor
+agent.monitor[0].reset()
+
+world.test(data_iter, n_epochs=1, plot=0, monitor=1)
+
+# save cumulative reward in test mode
+agent.monitor[0].save(os.path.join(world.out, 'cumulative reward'))
