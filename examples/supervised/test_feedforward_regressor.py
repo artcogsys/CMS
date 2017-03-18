@@ -1,6 +1,9 @@
 # Toy dataset for static regression data
 # Generates two random inputs and outputs their sum and product
 
+import matplotlib
+matplotlib.use('Qt4Agg') # macosx backend presently lacks blocking show() behavior when matplotlib is in non-interactive mode
+
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import scipy.stats as ss

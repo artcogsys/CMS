@@ -2,6 +2,9 @@
 # Generates two random inputs and classifies as 0 if their total is smaller than one
 # and as 1 otherwise
 
+import matplotlib
+matplotlib.use('Qt4Agg') # macosx backend presently lacks blocking show() behavior when matplotlib is in non-interactive mode
+
 import tools as tools
 from agent.supervised import StatelessAgent
 from brain.models import *

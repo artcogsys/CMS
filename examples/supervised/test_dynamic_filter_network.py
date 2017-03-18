@@ -1,5 +1,8 @@
 # Implementation of a dynamic filter layer: De Brabandere, B., Jia, X., Tuytelaars, T., Van Gool, L., 2016. Dynamic Filter Networks.
 
+import matplotlib
+matplotlib.use('Qt4Agg') # macosx backend presently lacks blocking show() behavior when matplotlib is in non-interactive mode
+
 from agent.supervised import StatelessAgent
 from brain.models import *
 from brain.networks import *

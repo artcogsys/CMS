@@ -2,6 +2,9 @@
 # 'representations'. Each neural population has its own (set of) RNN units. Each population projects to one output
 # variable (e.g. its BOLD response).
 
+import matplotlib
+matplotlib.use('Qt4Agg') # macosx backend presently lacks blocking show() behavior when matplotlib is in non-interactive mode
+
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import scipy.stats as ss

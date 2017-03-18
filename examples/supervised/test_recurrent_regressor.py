@@ -1,5 +1,8 @@
 # Toy dataset for dynamic regression data, test
 
+import matplotlib
+matplotlib.use('Qt4Agg') # macosx backend presently lacks blocking show() behavior when matplotlib is in non-interactive mode
+
 import matplotlib.cm as cm
 import scipy.stats as ss
 import tools as tools

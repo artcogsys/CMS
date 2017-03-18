@@ -1,5 +1,8 @@
 # contextnet; testing whether using context-dependent weights improves classification performance
 
+import matplotlib
+matplotlib.use('Qt4Agg') # macosx backend presently lacks blocking show() behavior when matplotlib is in non-interactive mode
+
 import math
 
 from chainer import initializers

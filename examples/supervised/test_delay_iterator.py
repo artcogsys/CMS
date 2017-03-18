@@ -1,6 +1,9 @@
 # example of using delayiterator to extend classification of static inputs over time
 # also uses masks to implement feedforward versus feedback drive in Elman network
 
+import matplotlib
+matplotlib.use('Qt4Agg') # macosx backend presently lacks blocking show() behavior when matplotlib is in non-interactive mode
+
 from agent.supervised import *
 from brain.models import *
 from world.base import World

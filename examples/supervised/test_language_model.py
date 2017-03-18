@@ -1,5 +1,8 @@
 # test language prediction on character level PTB data
 
+import matplotlib
+matplotlib.use('Qt4Agg') # macosx backend presently lacks blocking show() behavior when matplotlib is in non-interactive mode
+
 from agent.supervised import StatefulAgent
 from brain.models import *
 from brain.networks import *

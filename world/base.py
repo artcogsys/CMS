@@ -144,10 +144,10 @@ class World(object):
         for _iter in tqdm.tqdm(xrange(0, max_iter)):
 
             # reset agents at start of each epoch
-            map(lambda x: x.reset(), self.agents)
-
-            if val_iter:
-                map(lambda x: x.reset(), val_agents)
+            if _iter % n_epochs == 0:
+                map(lambda x: x.reset(), self.agents)
+                if val_iter:
+                    map(lambda x: x.reset(), val_agents)
 
             try:
                 data = d_it.next()

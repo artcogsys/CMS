@@ -1,5 +1,8 @@
 # Toy dataset for dynamic classification data
 
+import matplotlib
+matplotlib.use('Qt4Agg') # macosx backend presently lacks blocking show() behavior when matplotlib is in non-interactive mode
+
 import matplotlib.pyplot as plt
 import tools as tools
 from agent.supervised import StatefulAgent

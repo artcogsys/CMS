@@ -1,5 +1,8 @@
 # Example of how to perform a learning analysis; derived from test_feedforward_regressor
 
+import matplotlib
+matplotlib.use('Qt4Agg') # macosx backend presently lacks blocking show() behavior when matplotlib is in non-interactive mode
+
 import os
 import glob
 from tools import movie

@@ -7,6 +7,9 @@ from brain.networks import *
 from world.base import World
 from world.data import *
 
+import matplotlib
+matplotlib.use('Qt4Agg') # macosx backend presently lacks blocking show() behavior when matplotlib is in non-interactive mode
+
 # parameters
 n_epochs = 10
 
