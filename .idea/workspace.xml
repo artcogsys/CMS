@@ -2,26 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9f2d2109-f80d-4ff2-a6a3-f44f2bb29cbd" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/result/confusion_matrix.png" afterPath="$PROJECT_DIR$/examples/supervised/result/confusion_matrix.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/result/loss.png" afterPath="$PROJECT_DIR$/examples/supervised/result/loss.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/result/movie.mp4" afterPath="$PROJECT_DIR$/examples/supervised/result/movie.mp4" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/result/scatterplot.png" afterPath="$PROJECT_DIR$/examples/supervised/result/scatterplot.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/CMS.iml" afterPath="$PROJECT_DIR$/.idea/CMS.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/compare_RNNs.py" afterPath="$PROJECT_DIR$/examples/supervised/compare_RNNs.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/learning_analysis.py" afterPath="$PROJECT_DIR$/examples/supervised/learning_analysis.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/test_convnet_classifier.py" afterPath="$PROJECT_DIR$/examples/supervised/test_convnet_classifier.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/test_delay_iterator.py" afterPath="$PROJECT_DIR$/examples/supervised/test_delay_iterator.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/test_dynamic_filter_network.py" afterPath="$PROJECT_DIR$/examples/supervised/test_dynamic_filter_network.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/test_feedforward_classifier.py" afterPath="$PROJECT_DIR$/examples/supervised/test_feedforward_classifier.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/test_feedforward_regressor.py" afterPath="$PROJECT_DIR$/examples/supervised/test_feedforward_regressor.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/test_language_model.py" afterPath="$PROJECT_DIR$/examples/supervised/test_language_model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/test_recurrent_classifier.py" afterPath="$PROJECT_DIR$/examples/supervised/test_recurrent_classifier.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/supervised/test_recurrent_regressor.py" afterPath="$PROJECT_DIR$/examples/supervised/test_recurrent_regressor.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sandbox/DRM_example.py" afterPath="$PROJECT_DIR$/sandbox/DRM_example.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sandbox/contextnet.py" afterPath="$PROJECT_DIR$/sandbox/contextnet.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sandbox/hydranet.py" afterPath="$PROJECT_DIR$/sandbox/hydranet.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/world/base.py" afterPath="$PROJECT_DIR$/world/base.py" />
     </list>
     <ignored path="CMF.iws" />
@@ -46,7 +28,19 @@
         <entry file="file://$PROJECT_DIR$/examples/supervised/test_recurrent_regressor.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="60">
-              <caret line="4" column="0" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+              <caret line="5" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+              <folding>
+                <marker date="1489819653000" expanded="true" signature="1534:1626" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="supervised.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/agent/supervised.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="53">
+              <caret line="35" column="58" lean-forward="true" selection-start-line="35" selection-start-column="13" selection-end-line="35" selection-end-column="58" />
               <folding />
             </state>
           </provider>
@@ -72,68 +66,62 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="hydranet.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="base.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/world/base.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1055">
+              <caret line="167" column="59" lean-forward="false" selection-start-line="167" selection-start-column="59" selection-end-line="167" selection-end-column="59" />
+              <folding>
+                <element signature="e#0#31#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/brain/models.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1043">
+              <caret line="160" column="0" lean-forward="false" selection-start-line="160" selection-start-column="0" selection-end-line="160" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="hydranet.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/sandbox/hydranet.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test_feedforward_classifier.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/supervised/test_feedforward_classifier.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test_feedforward_regressor.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/supervised/test_feedforward_regressor.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test_language_model.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/supervised/test_language_model.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="60">
               <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="compare_RNNs.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/examples/supervised/compare_RNNs.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="10" column="29" lean-forward="true" selection-start-line="10" selection-start-column="29" selection-end-line="10" selection-end-column="29" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="base.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/agent/base.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="53">
+              <caret line="46" column="0" lean-forward="false" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#31#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="test_recurrent_classifier.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/examples/supervised/test_recurrent_classifier.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test_delay_iterator.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/supervised/test_delay_iterator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test_dynamic_filter_network.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/supervised/test_dynamic_filter_network.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="60">
               <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
@@ -193,7 +181,6 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/agent/base.py" />
         <option value="$PROJECT_DIR$/tools.py" />
-        <option value="$PROJECT_DIR$/world/base.py" />
         <option value="$PROJECT_DIR$/brain/monitor.py" />
         <option value="$PROJECT_DIR$/examples/supervised/test_recurrent_regressor.py" />
         <option value="$PROJECT_DIR$/examples/supervised/compare_RNNs.py" />
@@ -208,14 +195,15 @@
         <option value="$PROJECT_DIR$/sandbox/contextnet.py" />
         <option value="$PROJECT_DIR$/sandbox/DRM_example.py" />
         <option value="$PROJECT_DIR$/sandbox/hydranet.py" />
+        <option value="$PROJECT_DIR$/world/base.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="55" />
-    <option name="y" value="50" />
-    <option name="width" value="1293" />
-    <option name="height" value="747" />
+    <option name="x" value="49" />
+    <option name="y" value="33" />
+    <option name="width" value="1341" />
+    <option name="height" value="832" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -358,24 +346,7 @@
       <recent name="$PROJECT_DIR$/sandbox/hydranet" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.test_recurrent_regressor">
-    <configuration default="false" name="hydranet" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sandbox" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="CMS" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sandbox/hydranet.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="Python.compare_RNNs">
     <configuration default="false" name="test_simple_task" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -440,6 +411,23 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="CMS" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/examples/supervised/test_recurrent_regressor.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="compare_RNNs" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/examples/supervised" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="CMS" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/examples/supervised/compare_RNNs.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -579,19 +567,19 @@
       <method />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.hydranet" />
-      <item index="1" class="java.lang.String" itemvalue="Python.test_simple_task" />
-      <item index="2" class="java.lang.String" itemvalue="Python.test_data_task" />
-      <item index="3" class="java.lang.String" itemvalue="Python.test_feedforward_classifier" />
-      <item index="4" class="java.lang.String" itemvalue="Python.test_recurrent_regressor" />
+      <item index="0" class="java.lang.String" itemvalue="Python.test_simple_task" />
+      <item index="1" class="java.lang.String" itemvalue="Python.test_data_task" />
+      <item index="2" class="java.lang.String" itemvalue="Python.test_feedforward_classifier" />
+      <item index="3" class="java.lang.String" itemvalue="Python.test_recurrent_regressor" />
+      <item index="4" class="java.lang.String" itemvalue="Python.compare_RNNs" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.test_recurrent_regressor" />
-        <item index="1" class="java.lang.String" itemvalue="Python.test_feedforward_classifier" />
-        <item index="2" class="java.lang.String" itemvalue="Python.test_data_task" />
-        <item index="3" class="java.lang.String" itemvalue="Python.test_simple_task" />
-        <item index="4" class="java.lang.String" itemvalue="Python.hydranet" />
+        <item index="0" class="java.lang.String" itemvalue="Python.compare_RNNs" />
+        <item index="1" class="java.lang.String" itemvalue="Python.test_recurrent_regressor" />
+        <item index="2" class="java.lang.String" itemvalue="Python.test_feedforward_classifier" />
+        <item index="3" class="java.lang.String" itemvalue="Python.test_data_task" />
+        <item index="4" class="java.lang.String" itemvalue="Python.test_simple_task" />
       </list>
     </recent_temporary>
   </component>
@@ -612,15 +600,15 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="55" y="50" width="1293" height="747" extended-state="0" />
+    <frame x="49" y="33" width="1341" height="832" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25707546" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24772727" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32100397" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4412214" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24594595" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32780084" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
@@ -783,13 +771,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/brain/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="160" column="0" lean-forward="false" selection-start-line="160" selection-start-column="0" selection-end-line="160" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/examples/result/loss.png" />
     <entry file="file://$PROJECT_DIR$/examples/result/cumulative reward.png" />
     <entry file="file://$PROJECT_DIR$/examples/reinforcement/result/loss.png">
@@ -882,24 +863,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/agent/supervised.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="840">
-          <caret line="59" column="20" lean-forward="false" selection-start-line="39" selection-start-column="8" selection-end-line="59" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/agent/base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="630">
-          <caret line="46" column="0" lean-forward="false" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/brain/networks.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2910">
@@ -916,16 +879,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/world/base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="267">
-          <caret line="200" column="0" lean-forward="false" selection-start-line="200" selection-start-column="0" selection-end-line="200" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/brain/monitor.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
@@ -933,14 +886,6 @@
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/examples/supervised/compare_RNNs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -957,7 +902,7 @@
         <state relative-caret-position="60">
           <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
           <folding>
-            <element signature="e#0#31#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1013,8 +958,10 @@
     <entry file="file://$PROJECT_DIR$/examples/supervised/test_recurrent_regressor.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
-          <caret line="4" column="0" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-          <folding />
+          <caret line="5" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <folding>
+            <marker date="1489819653000" expanded="true" signature="1534:1626" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1037,8 +984,52 @@
     <entry file="file://$PROJECT_DIR$/sandbox/hydranet.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
-          <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/supervised/compare_RNNs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="29" lean-forward="true" selection-start-line="10" selection-start-column="29" selection-end-line="10" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/agent/supervised.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="53">
+          <caret line="35" column="58" lean-forward="true" selection-start-line="35" selection-start-column="13" selection-end-line="35" selection-end-column="58" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/brain/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1043">
+          <caret line="160" column="0" lean-forward="false" selection-start-line="160" selection-start-column="0" selection-end-line="160" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/agent/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="53">
+          <caret line="46" column="0" lean-forward="false" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/world/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1055">
+          <caret line="167" column="59" lean-forward="false" selection-start-line="167" selection-start-column="59" selection-end-line="167" selection-end-column="59" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
