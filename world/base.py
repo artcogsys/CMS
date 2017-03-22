@@ -165,7 +165,6 @@ class World(object):
             if not val_iter is None:
 
                 # NOTE THAT THIS IS DONE AT EACH ITERATION; VALIDATION MODEL UPDATING IS ALSO BASED ON 1 ITERATION!
-                # SHOULD ONLY BE DONE AFTER MODEL UPDATING!
 
                 # copy parameters of trained model
                 for i in range(self.n_agents):
